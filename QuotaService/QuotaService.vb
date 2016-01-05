@@ -11,7 +11,7 @@ Public Class QuotaService
     Public client As SimpleWifi.Win32.WlanClient = New SimpleWifi.Win32.WlanClient
     Public iface As SimpleWifi.Win32.WlanInterface
     Public wc As WebClient = New WebClient
-    Public requestHandler As String = "http://edu.wearetrying.info/quota/requestHandler.php?"
+    Public requestHandler As String = "http://localhost/quota_new/Quota/web/app_dev.php/request/user/?"
     Public mac As String = ""
     ' Set up a timer to trigger every minute.
     Public timer As System.Timers.Timer = New System.Timers.Timer()
@@ -24,7 +24,7 @@ Public Class QuotaService
         wc.Proxy = Nothing
         iface = client.Interfaces(0)
         mac = iface.NetworkInterface.GetPhysicalAddress().ToString()
-        requestHandler = requestHandler & "mac=" & mac & "&"
+        requestHandler = requestHandler & mac & "\"
         ' Add code here to start your service. This method should set things
         ' in motion so your service can do its work.
         Dim retries As Integer = 3
@@ -106,10 +106,11 @@ retry:
 
     End Sub
     Function downloadData() As String()
-        Dim url As String = requestHandler & "req=get"
+        Dim url As String = requestHandler & "check"
         Dim tries As Integer = 0
 re:
         Dim response As String = wc.DownloadString(url)
+
         If response.Split(";").Count < 4 Then
             Threading.Thread.Sleep(1000)
             tries = tries + 1
