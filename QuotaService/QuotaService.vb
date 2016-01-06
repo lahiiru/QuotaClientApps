@@ -74,15 +74,16 @@ retry:
             Log("#UPDATE:" & response)
             Return True
         ElseIf (json.SelectToken("status") = "BLOCKED") Then
-            Log("#BLOCKED")
-
+            Log("#MSG:You are blacklisted")
+            Log("#UPDATE:" & response)
             disconnect()
         ElseIf (json.SelectToken("status") = "OVER") Then
-            Log("#OVER")
+            Log("#MSG:Your remaining quota is less than 1Mb")
+            Log("#UPDATE:" & response)
             disconnect()
         ElseIf (json.SelectToken("status") = "ERROR") Then
-            Log("#ERROR")
-            disconnect()
+            Log("#MSG:Internal server error occured")
+            Log("#UPDATE:" & response)
         End If
         Return False
     End Function

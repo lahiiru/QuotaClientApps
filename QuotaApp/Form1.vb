@@ -92,7 +92,18 @@ e104:
         Try
             ServiceController1.Refresh()
             EventLog1.Source = "Quota"
-            TextBox1.Text = EventLog1.Entries(EventLog1.Entries.Count - 1).Message
+
+            Dim msg As String
+            Dim update_msg As String
+            Dim log = EventLog1.Entries(EventLog1.Entries.Count - 1).Message
+
+            If log.Contains("#MSG") Then
+                msg = log.Replace("#MSG", "")
+                MsgBox("Message : " & msg)
+            ElseIf log.Contains("#UPDATE") Then
+                update_msg = log.Replace("#UPDATE", "")
+                MsgBox("UPDATE msg : " & update_msg)
+            End If
 
             Select Case ServiceController1.Status
                 Case ServiceControllerStatus.StartPending
@@ -157,8 +168,6 @@ e104:
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Exclamation, "Service error")
         End Try
-
-
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
