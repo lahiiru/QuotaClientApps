@@ -34,16 +34,14 @@ retry:
         Thread.Sleep(3000 / retries)
         If isConnectedTo() Then
             Log("Successfully connected.")
-            If (usercheck()) Then
-
-            End If
+            usercheck()
         ElseIf retries > 1 Then
-            retries = retries - 1
-            Log("Connecting uploading tries " & retries)
-            GoTo retry
+        retries = retries - 1
+        Log("Connecting uploading tries " & retries)
+        GoTo retry
         Else
-            Log("Coult'nt connect")
-            'Me.Stop()
+        Log("Coult'nt connect")
+        'Me.Stop()
 
         End If
 
@@ -70,7 +68,23 @@ retry:
         Log("URL : " & url)
         Dim response As String = wc.DownloadString(url)
         Log("RESPONSE : " & response)
-        Return True
+        Dim json As JObject = JObject.Parse(response)
+        If (json.SelectToken("status") = "OK") Then
+            Log("#MSG:Connection successful")
+            Log("#UPDATE:" & response)
+            Return True
+        ElseIf (json.SelectToken("status") = "BLOCKED") Then
+            Log("#BLOCKED")
+
+            disconnect()
+        ElseIf (json.SelectToken("status") = "OVER") Then
+            Log("#OVER")
+            disconnect()
+        ElseIf (json.SelectToken("status") = "ERROR") Then
+            Log("#ERROR")
+            disconnect()
+        End If
+        Return False
     End Function
 
     Sub prepareUsage()
