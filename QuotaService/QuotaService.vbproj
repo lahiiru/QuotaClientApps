@@ -46,11 +46,12 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\WindowsApplication3\WindowsApplication3\bin\Debug\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SimpleWifi">
-      <HintPath>..\..\WindowsApplication3\WindowsApplication3\bin\Debug\SimpleWifi.dll</HintPath>
+      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\SimpleWifi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
@@ -63,7 +64,10 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Twitterizer2">
-      <HintPath>..\..\WindowsApplication3\WindowsApplication3\bin\Debug\Twitterizer2.dll</HintPath>
+      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Twitterizer2.dll</HintPath>
+    </Reference>
+    <Reference Include="Twitterizer2.Asynchronous">
+      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Twitterizer2.Asynchronous.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

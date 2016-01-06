@@ -82,13 +82,12 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Newtonsoft.Json.dll</HintPath>
+      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="SimpleWifi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\SimpleWifi.dll</HintPath>
+    <Reference Include="SimpleWifi">
+      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\SimpleWifi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -101,20 +100,15 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Twitterizer2, Version=2.3.0.2650, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Twitterizer2.dll</HintPath>
+    <Reference Include="Twitterizer2">
+      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Twitterizer2.dll</HintPath>
     </Reference>
-    <Reference Include="Twitterizer2.Asynchronous, Version=2.4.2.41742, Culture=neutral, PublicKeyToken=69d1469eac671567, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Twitterizer2.Asynchronous.dll</HintPath>
+    <Reference Include="Twitterizer2.Asynchronous">
+      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Twitterizer2.Asynchronous.dll</HintPath>
     </Reference>
     <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="WlanNative">
-      <HintPath>..\..\..\..\..\Desktop\Debug\WlanNative.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />

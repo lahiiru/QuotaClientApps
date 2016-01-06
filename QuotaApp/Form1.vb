@@ -165,4 +165,13 @@ e104:
         Dim json As JObject = JObject.Parse("{'status':'OK','details':{'name':'Lahiru Slave','package':5000000,'usage':'332345'}}")
         MsgBox(json.SelectToken("details").SelectToken("name"))
     End Sub
+    Sub connectProcess()
+        Dim profileXml As String = "<?xml version1=""1.0""?><WLANProfile xmlns=""http://www.microsoft.com/networking/WLAN/profile/v1""><name>{0}</name><SSIDConfig><SSID><name>{0}</name></SSID></SSIDConfig><connectionType>ESS</connectionType><connectionMode>manual</connectionMode><MSM><security><authEncryption><authentication>WPA2PSK</authentication><encryption>AES</encryption><useOneX>false</useOneX></authEncryption><sharedKey><keyType>passPhrase</keyType><protected>false</protected><keyMaterial>{1}</keyMaterial></sharedKey></security></MSM><MacRandomization xmlns=""http://www.microsoft.com/networking/WLAN/profile/v3""><enableRandomization>false</enableRandomization></MacRandomization></WLANProfile>"
+        profileXml = String.Format(profileXml, "NO FREE", "wifIdisable123")
+        iface.Connect(WlanConnectionMode.TemporaryProfile, Dot11BssType.Any, profileXml)
+    End Sub
+  
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        connectProcess()
+    End Sub
 End Class

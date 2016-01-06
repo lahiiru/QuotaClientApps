@@ -6,7 +6,7 @@
       <Value Profile="(Default)">NO FREE</Value>
     </Setting>
     <Setting Name="key" Type="System.String" Scope="User">
-      <Value Profile="(Default)">12345678</Value>
+      <Value Profile="(Default)">w!fIdisable123</Value>
     </Setting>
     <Setting Name="usage" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
