@@ -26,6 +26,8 @@ Public Class Form1
             Label11.ForeColor = Color.DarkGreen
         End If
         Button1.Enabled = True
+        fillSSIDList()
+
     End Sub
     Function getDetails() As String()
         Dim url As String = requestHandler & "req=get"
@@ -80,31 +82,15 @@ e104:
         End If
         Return False
     End Function
-    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
-    End Sub
+  
     Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel1.LinkClicked
         Dim sInfo As New ProcessStartInfo("http://edu.wearetrying.info/quota")
         Process.Start(sInfo)
     End Sub
-
+    Dim flag As Boolean = True
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         Try
             ServiceController1.Refresh()
-            EventLog1.Source = "Quota"
-
-            Dim msg As String
-            Dim update_msg As String
-            Dim log = EventLog1.Entries(EventLog1.Entries.Count - 1).Message
-
-            If log.Contains("#MSG") Then
-                msg = log.Replace("#MSG", "")
-                MsgBox("Message : " & msg)
-            ElseIf log.Contains("#UPDATE") Then
-                update_msg = log.Replace("#UPDATE", "")
-                MsgBox("UPDATE msg : " & update_msg)
-            End If
-
             Select Case ServiceController1.Status
                 Case ServiceControllerStatus.StartPending
                     Button2.Text = "Connecting..."
@@ -151,7 +137,29 @@ e104:
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Dim curr_ssid As String
+        Dim curr_passKey As String
 
+        If Not cmbSSID.SelectedItem Is Nothing Then
+            curr_ssid = cmbSSID.SelectedItem            
+            curr_passKey = getPassKey(curr_ssid)
+        End If
+
+    End Sub
+    Function getPassKey(ByVal ssid As String) As String
+        Dim curr_passKey As String
+        If My.Settings.ssidCollection Is Nothing Then
+            My.Settings.ssidCollection = New Specialized.StringCollection()
+        End If
+        If My.Settings.ssidCollection.Contains(cmbSSID.SelectedItem) Then
+            curr_passKey = My.Settings.pryKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
+        Else
+            curr_passKey = InputBox("Please enter passkey")
+        End If
+        Return curr_passKey
+    End Function
+
+    Sub startService(ByVal curr_ssid As String, ByVal curr_passKey As String)
         Try
             ServiceController1.ServiceName = "Quota2"
             Try
@@ -161,7 +169,7 @@ e104:
             End Try
 
             If Not ServiceController1.Status = ServiceControllerStatus.Running Then
-                ServiceController1.Start()
+                ServiceController1.Start({curr_ssid, curr_passKey})
             Else
                 ServiceController1.Stop()
             End If
@@ -182,5 +190,24 @@ e104:
   
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
         connectProcess()
+    End Sub
+
+    Public Sub processLog(ByVal [source] As Object, ByVal e As EntryWrittenEventArgs)
+        MsgBox(e.Entry.Message)
+    End Sub
+
+    Private Sub cmbSSID_Click(sender As Object, e As EventArgs) Handles cmbSSID.Click
+        fillSSIDList()
+    End Sub
+
+    Sub fillSSIDList()
+        cmbSSID.Items.Clear()
+        For Each i As WlanAvailableNetwork In iface.GetAvailableNetworkList(Nothing)
+            Dim ssid = System.Text.ASCIIEncoding.ASCII.GetString(i.dot11Ssid.SSID, 0, i.dot11Ssid.SSIDLength)
+            If Not cmbSSID.Items.Contains(ssid) Then
+                cmbSSID.Items.Add(ssid)
+            End If
+
+        Next
     End Sub
 End Class

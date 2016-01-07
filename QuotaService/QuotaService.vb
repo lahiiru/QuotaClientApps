@@ -14,18 +14,29 @@ Public Class QuotaService
     Public wc As WebClient = New WebClient
     Public requestHandler As String = "http://localhost/quota_new/Quota/web/app_dev.php/request/user/"
     Public mac As String = ""
+    Public myLog As New EventLog()
     ' Set up a timer to trigger every minute.
     Public timer As System.Timers.Timer = New System.Timers.Timer()
 
     Protected Overrides Sub OnStart(ByVal args() As String)
+        My.Settings.ssid = args(0)
+
+        'create custom log called Quatalog
+        myLog.Log = "QuotaLog"
+        myLog.Source = "QuotaSvr"
         Log("starting")
+        Try
+            EventLog.CreateEventSource("QuotaSvr", "QuotaLog")
+        Catch ex As Exception
+        End Try
+
         'disconectProcess()
         timer.Interval = 1000 ' 60 seconds
         AddHandler timer.Elapsed, AddressOf Me.OnTimer
         wc.Proxy = Nothing
         iface = client.Interfaces(0)
         mac = iface.NetworkInterface.GetPhysicalAddress().ToString()
-        requestHandler = requestHandler & mac & "/"
+        requestHandler = requestHandler & "/" & My.Settings.ssid & "/" & mac & "/"
         ' Add code here to start your service. This method should set things
         ' in motion so your service can do its work.
         Dim retries As Integer = 3
@@ -36,12 +47,12 @@ retry:
             Log("Successfully connected.")
             usercheck()
         ElseIf retries > 1 Then
-        retries = retries - 1
-        Log("Connecting uploading tries " & retries)
-        GoTo retry
+            retries = retries - 1
+            Log("Connecting uploading tries " & retries)
+            GoTo retry
         Else
-        Log("Coult'nt connect")
-        'Me.Stop()
+            Log("Coult'nt connect")
+            'Me.Stop()
 
         End If
 
@@ -52,9 +63,9 @@ retry:
     Private Sub OnTimer(sender As Object, e As Timers.ElapsedEventArgs)
         ' TODO: Insert monitoring activities here.
         prepareUsage()
-        'If (My.Settings.pending > 100000) Then
-        'uploadData()
-        'End If
+        If (My.Settings.pending > 100000) Then
+            uploadData()
+        End If
         If Not iface.NetworkInterface.OperationalStatus = NetworkInformation.OperationalStatus.Up Or Not isConnectedTo() Then
             My.Settings.Save()
             timer.Stop()
@@ -65,9 +76,7 @@ retry:
     'check for valid user
     Function usercheck() As Boolean
         Dim url As String = requestHandler & "check"
-        Log("URL : " & url)
         Dim response As String = wc.DownloadString(url)
-        Log("RESPONSE : " & response)
         Dim json As JObject = JObject.Parse(response)
         If (json.SelectToken("status") = "OK") Then
             Log("#MSG:Connection successful")
@@ -83,7 +92,6 @@ retry:
             disconnect()
         ElseIf (json.SelectToken("status") = "ERROR") Then
             Log("#MSG:Internal server error occured")
-            Log("#UPDATE:" & response)
         End If
         Return False
     End Function
@@ -105,7 +113,7 @@ retry:
         preparePending()
     End Sub
     Sub Log(msg As String)
-        EventLog1.WriteEntry(msg)
+        myLog.WriteEntry(msg)
     End Sub
     Sub check()
         If My.Settings.quota < 1000 Or My.Settings.blocked = 1 Then
@@ -205,9 +213,10 @@ re:
     End Sub
     Protected Overrides Sub OnStop()
         Log("Stopping")
-        disconnect()
         prepareUsage()
         preparePending()
+        uploadData()
+        disconnect()
         My.Settings.Save()
         ' Add code here to perform any tear-down necessary to stop your service.
     End Sub

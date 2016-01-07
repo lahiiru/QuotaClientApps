@@ -51,6 +51,7 @@ Partial Class Form1
         Me.Label1 = New System.Windows.Forms.Label()
         Me.ServiceController1 = New System.ServiceProcess.ServiceController()
         Me.Button4 = New System.Windows.Forms.Button()
+        Me.cmbSSID = New System.Windows.Forms.ComboBox()
         CType(Me.EventLog1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -181,9 +182,9 @@ Partial Class Form1
         Me.Button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button2.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Button2.ForeColor = System.Drawing.Color.Black
-        Me.Button2.Location = New System.Drawing.Point(246, 129)
+        Me.Button2.Location = New System.Drawing.Point(455, 82)
         Me.Button2.Name = "Button2"
-        Me.Button2.Size = New System.Drawing.Size(123, 36)
+        Me.Button2.Size = New System.Drawing.Size(145, 36)
         Me.Button2.TabIndex = 14
         Me.Button2.Text = "Connect"
         Me.Button2.UseVisualStyleBackColor = False
@@ -284,11 +285,20 @@ Partial Class Form1
         Me.Button4.Text = "Button4"
         Me.Button4.UseVisualStyleBackColor = True
         '
+        'cmbSSID
+        '
+        Me.cmbSSID.FormattingEnabled = True
+        Me.cmbSSID.Location = New System.Drawing.Point(455, 124)
+        Me.cmbSSID.Name = "cmbSSID"
+        Me.cmbSSID.Size = New System.Drawing.Size(143, 21)
+        Me.cmbSSID.TabIndex = 22
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(612, 370)
+        Me.Controls.Add(Me.cmbSSID)
         Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Label1)
@@ -345,4 +355,5 @@ Partial Class Form1
     Public WithEvents ServiceController1 As ServiceProcess.ServiceController
     Friend WithEvents ToolStripStatusLabel3 As ToolStripStatusLabel
     Friend WithEvents Button4 As System.Windows.Forms.Button
+    Friend WithEvents cmbSSID As System.Windows.Forms.ComboBox
 End Class

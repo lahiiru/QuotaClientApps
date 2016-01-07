@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="ssid" Type="System.String" Scope="User">
-      <Value Profile="(Default)">NO FREE</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="key" Type="System.String" Scope="User">
       <Value Profile="(Default)">w!fIdisable123</Value>

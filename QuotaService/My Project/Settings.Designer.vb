@@ -56,7 +56,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("NO FREE")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
         Public Property ssid() As String
             Get
                 Return CType(Me("ssid"),String)
