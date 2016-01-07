@@ -68,7 +68,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("w!fIdisable123")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
         Public Property key() As String
             Get
                 Return CType(Me("key"),String)

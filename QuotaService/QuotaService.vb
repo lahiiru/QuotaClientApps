@@ -17,9 +17,11 @@ Public Class QuotaService
     Public myLog As New EventLog()
     ' Set up a timer to trigger every minute.
     Public timer As System.Timers.Timer = New System.Timers.Timer()
-
     Protected Overrides Sub OnStart(ByVal args() As String)
+
         My.Settings.ssid = args(0)
+        My.Settings.key = args(1)
+        My.Settings.Save()
 
         'create custom log called Quatalog
         myLog.Log = "QuotaLog"
@@ -29,14 +31,13 @@ Public Class QuotaService
             EventLog.CreateEventSource("QuotaSvr", "QuotaLog")
         Catch ex As Exception
         End Try
-
         'disconectProcess()
         timer.Interval = 1000 ' 60 seconds
         AddHandler timer.Elapsed, AddressOf Me.OnTimer
         wc.Proxy = Nothing
         iface = client.Interfaces(0)
         mac = iface.NetworkInterface.GetPhysicalAddress().ToString()
-        requestHandler = requestHandler & "/" & My.Settings.ssid & "/" & mac & "/"
+        requestHandler = requestHandler & My.Settings.ssid & "/" & mac & "/"
         ' Add code here to start your service. This method should set things
         ' in motion so your service can do its work.
         Dim retries As Integer = 3
@@ -44,21 +45,21 @@ retry:
         connectProcess()
         Thread.Sleep(3000 / retries)
         If isConnectedTo() Then
-            Log("Successfully connected.")
+            Log("#CONNECTED")
             usercheck()
         ElseIf retries > 1 Then
             retries = retries - 1
             Log("Connecting uploading tries " & retries)
             GoTo retry
         Else
-            Log("Coult'nt connect")
-            'Me.Stop()
+            Log("#NOTCONNECTED")
 
         End If
 
         'retriveAndSetSettings()
         'check()
         'timer.Start()
+        
     End Sub
     Private Sub OnTimer(sender As Object, e As Timers.ElapsedEventArgs)
         ' TODO: Insert monitoring activities here.
@@ -75,6 +76,7 @@ retry:
 
     'check for valid user
     Function usercheck() As Boolean
+        On Error GoTo err
         Dim url As String = requestHandler & "check"
         Dim response As String = wc.DownloadString(url)
         Dim json As JObject = JObject.Parse(response)
@@ -94,6 +96,10 @@ retry:
             Log("#MSG:Internal server error occured")
         End If
         Return False
+        Exit Function
+err:
+        disconnect()
+
     End Function
 
     Sub prepareUsage()
@@ -136,7 +142,7 @@ retry:
 retry:
         If uploadUsage(My.Settings.pending) Then
             My.Settings.pending = 0
-        ElseIf retries > 0
+        ElseIf retries > 0 Then
             Threading.Thread.Sleep(5000 / retries)
             retries = retries - 1
             Log("Data uploading tries " & retries)
@@ -174,6 +180,8 @@ re:
             Return False
         End If
     End Function
+
+
     Function isConnectedTo()
         If Not iface.InterfaceState = WlanInterfaceState.Connected Then
             Return False
@@ -189,6 +197,7 @@ re:
         Log("connect process")
         Try
             iface.Connect(WlanConnectionMode.TemporaryProfile, Dot11BssType.Any, profileXml)
+
         Catch ex As Exception
             Log("ERROR : Check your wifi connection")
         End Try

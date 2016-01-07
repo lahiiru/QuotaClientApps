@@ -185,24 +185,24 @@ Namespace My
             End Set
         End Property
         
-        <Global.System.Configuration.UserScopedSettingAttribute(), _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()> _
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
         Public Property pryKeyCollection() As Global.System.Collections.Specialized.StringCollection
             Get
-                Return CType(Me("pryKeyCollection"), Global.System.Collections.Specialized.StringCollection)
+                Return CType(Me("pryKeyCollection"),Global.System.Collections.Specialized.StringCollection)
             End Get
-            Set(value As Global.System.Collections.Specialized.StringCollection)
+            Set
                 Me("pryKeyCollection") = value
             End Set
         End Property
-
-        <Global.System.Configuration.UserScopedSettingAttribute(), _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()> _
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute()>  _
         Public Property secKeyCollection() As Global.System.Collections.Specialized.StringCollection
             Get
-                Return CType(Me("secKeyCollection"), Global.System.Collections.Specialized.StringCollection)
+                Return CType(Me("secKeyCollection"),Global.System.Collections.Specialized.StringCollection)
             End Get
-            Set(value As Global.System.Collections.Specialized.StringCollection)
+            Set
                 Me("secKeyCollection") = value
             End Set
         End Property

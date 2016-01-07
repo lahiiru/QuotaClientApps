@@ -7,8 +7,31 @@ Imports Newtonsoft.Json.Linq
 
 
 Public Class Form1
+    Public curr_ssid As String
+    Public curr_passKey As String
+    Public connect_flag As Integer = 0
+    Public default_passKey As String = "w!fIdisable123"
+
+    Enum ConnectState
+        CONNECT_DEFAULT
+        CONNECT_PRIMARY
+        CONNECT_SECONDRY
+        CONNECT_CUSTOM
+    End Enum
+
+    Public connect_using As ConnectState = ConnectState.CONNECT_PRIMARY
 
     Sub load()
+        If My.Settings.ssidCollection Is Nothing Then
+            My.Settings.ssidCollection = New Specialized.StringCollection
+        End If
+        If My.Settings.pryKeyCollection Is Nothing Then
+            My.Settings.pryKeyCollection = New Specialized.StringCollection
+        End If
+        If My.Settings.secKeyCollection Is Nothing Then
+            My.Settings.secKeyCollection = New Specialized.StringCollection
+        End If
+
         If My.Computer.Network.IsAvailable Then
             retriveData()
         End If
@@ -137,26 +160,52 @@ e104:
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        Dim curr_ssid As String
-        Dim curr_passKey As String
+        If Button2.Text.ToUpper() = "CONNECT" Then
+            If Not cmbSSID.SelectedItem Is Nothing Then
+                curr_ssid = cmbSSID.SelectedItem
+                MsgBox("try to connect using primary..")
+                serviceHandler()
+            End If
+            End If
 
-        If Not cmbSSID.SelectedItem Is Nothing Then
-            curr_ssid = cmbSSID.SelectedItem            
-            curr_passKey = getPassKey(curr_ssid)
-        End If
+            If Button2.Text.ToUpper() = "DISCONNECT" Then
+                ServiceController1.Stop()
+            End If
+
 
     End Sub
+    Sub serviceHandler()
+        Dim k = My.Settings.ssidCollection.Contains(curr_ssid)
+        If Not My.Settings.ssidCollection.Contains(curr_ssid) Then
+            If connect_using = ConnectState.CONNECT_PRIMARY Then
+                MsgBox("connect using default")
+                connect_using = ConnectState.CONNECT_DEFAULT
+            End If
+        End If
+
+        curr_passKey = getPassKey(curr_ssid)
+        startService(curr_ssid, curr_passKey)
+    End Sub
+
     Function getPassKey(ByVal ssid As String) As String
-        Dim curr_passKey As String
-        If My.Settings.ssidCollection Is Nothing Then
-            My.Settings.ssidCollection = New Specialized.StringCollection()
-        End If
-        If My.Settings.ssidCollection.Contains(cmbSSID.SelectedItem) Then
-            curr_passKey = My.Settings.pryKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
-        Else
-            curr_passKey = InputBox("Please enter passkey")
-        End If
-        Return curr_passKey
+        Dim passKey As String = ""
+
+        Select Case connect_using
+            Case ConnectState.CONNECT_DEFAULT
+                passKey = default_passKey
+            Case ConnectState.CONNECT_PRIMARY
+                If My.Settings.pryKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
+                    passKey = My.Settings.pryKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
+                End If
+            Case ConnectState.CONNECT_SECONDRY
+                If My.Settings.secKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
+                    passKey = My.Settings.secKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
+                End If
+            Case ConnectState.CONNECT_CUSTOM
+                passKey = InputBox("Please enter passkey")
+        End Select
+
+        Return passKey
     End Function
 
     Sub startService(ByVal curr_ssid As String, ByVal curr_passKey As String)
@@ -183,7 +232,7 @@ e104:
         MsgBox(json.SelectToken("details").SelectToken("name"))
     End Sub
     Sub connectProcess()
-        Dim profileXml As String = "<?xml version=""1.0""?>       <WLANProfile xmlns=""http://www.microsoft.com/networking/WLAN/profile/v1"">       <name>{0}</name>       <SSIDConfig>       <SSID>       <name>{0}</name>       </SSID>       </SSIDConfig>       <connectionType>ESS</connectionType>       <connectionMode>manual</connectionMode>       <MSM>       <security>       <authEncryption>       <authentication>WPA2PSK</authentication>       <encryption>AES</encryption>       <useOneX>false</useOneX>       </authEncryption>       <sharedKey>       <keyType>passPhrase</keyType>       <protected>false</protected>       <keyMaterial>{1}</keyMaterial>       </sharedKey>       </security>       </MSM>       <MacRandomization xmlns=""http://www.microsoft.com/networking/WLAN/profile/v3"">       <enableRandomization>false</enableRandomization>       </MacRandomization>       </WLANProfile>"
+        Dim profileXml As String = "<?xml version=""1.0""?><WLANProfile xmlns=""http://www.microsoft.com/networking/WLAN/profile/v1"">       <name>{0}</name>       <SSIDConfig>       <SSID>       <name>{0}</name>       </SSID>       </SSIDConfig>       <connectionType>ESS</connectionType>       <connectionMode>manual</connectionMode>       <MSM>       <security>       <authEncryption>       <authentication>WPA2PSK</authentication>       <encryption>AES</encryption>       <useOneX>false</useOneX>       </authEncryption>       <sharedKey>       <keyType>passPhrase</keyType>       <protected>false</protected>       <keyMaterial>{1}</keyMaterial>       </sharedKey>       </security>       </MSM>       <MacRandomization xmlns=""http://www.microsoft.com/networking/WLAN/profile/v3"">       <enableRandomization>false</enableRandomization>       </MacRandomization>       </WLANProfile>"
         profileXml = String.Format(profileXml, "NO FREE", "w!fIdisable123")
         iface.Connect(WlanConnectionMode.TemporaryProfile, Dot11BssType.Any, profileXml)
     End Sub
@@ -194,6 +243,35 @@ e104:
 
     Public Sub processLog(ByVal [source] As Object, ByVal e As EntryWrittenEventArgs)
         MsgBox(e.Entry.Message)
+        If e.Entry.Message = "#CONNECTED" Then
+            If Not My.Settings.ssidCollection.Contains(curr_ssid) Then
+                MsgBox("you are connectd using default key")
+            End If
+        End If
+
+        If e.Entry.Message = "#NOTCONNECTED" Then
+            Select Case connect_using
+                Case ConnectState.CONNECT_PRIMARY
+                    MsgBox("connection try with secondry")
+                    connect_using = ConnectState.CONNECT_SECONDRY
+                    serviceHandler()
+                Case ConnectState.CONNECT_SECONDRY
+                    MsgBox("connection try with custom1")
+                    connect_using = ConnectState.CONNECT_CUSTOM
+                    serviceHandler()
+                Case ConnectState.CONNECT_DEFAULT
+                    MsgBox("connection try with custom2")
+                    connect_using = ConnectState.CONNECT_CUSTOM
+                    serviceHandler()
+                Case ConnectState.CONNECT_CUSTOM
+                    connect_using = ConnectState.CONNECT_PRIMARY
+                    ServiceController1.Stop()
+            End Select
+
+        End If
+       
+
+
     End Sub
 
     Private Sub cmbSSID_Click(sender As Object, e As EventArgs) Handles cmbSSID.Click
@@ -207,7 +285,44 @@ e104:
             If Not cmbSSID.Items.Contains(ssid) Then
                 cmbSSID.Items.Add(ssid)
             End If
-
         Next
     End Sub
+
+    Private Shared Function Encode(ssid As String) As String
+        Dim upper As String() = {"A", "B", "C", "D", "E", "F", _
+            "G", "H", "I", "J", "K", "L", _
+            "M", "N", "O", "P", "Q", "R", _
+            "S", "T", "U", "V", "W", "X", _
+            "Y", "Z"}
+        Dim lower As String() = {"a", "b", "c", "d", "e", "f", _
+            "g", "h", "i", "j", "k", "l", _
+            "m", "n", "o", "p", "q", "r", _
+            "s", "t", "u", "v", "w", "x", _
+            "y", "z"}
+        Dim symbols As String() = {"*", "#", "$", "&", "%"}
+        Dim numbers As Integer() = {0, 1, 2, 3, 4, 5, _
+            6, 7, 8, 9}
+
+        Dim encode__1 As String = ssid
+        While encode__1.Length < 10
+            encode__1 += ssid
+        End While
+
+        encode__1 = encode__1.Substring(0, 10)
+
+
+        Dim encoded_str As String = lower(CInt(AscW(encode__1(0))) Mod 26)
+
+        encoded_str += numbers(CInt(AscW(encode__1(1))) Mod 10)
+        encoded_str += numbers(CInt(AscW(encode__1(2))) Mod 10)
+        encoded_str += symbols(CInt(AscW(encode__1(3))) Mod 5)
+        encoded_str += lower(CInt(AscW(encode__1(4))) Mod 26)
+        encoded_str += upper(CInt(AscW(encode__1(5))) Mod 26)
+        encoded_str += lower(CInt(AscW(encode__1(6))) Mod 26)
+        encoded_str += upper(CInt(AscW(encode__1(7))) Mod 26)
+        encoded_str += numbers(CInt(AscW(encode__1(8))) Mod 10)
+        encoded_str += symbols(CInt(AscW(encode__1(9))) Mod 5)
+
+        Return encoded_str
+    End Function
 End Class
