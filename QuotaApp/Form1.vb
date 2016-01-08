@@ -8,18 +8,17 @@ Imports Newtonsoft.Json.Linq
 
 Public Class Form1
     Public curr_ssid As String
-    Public curr_passKey As String
+    Public curr_passKey As String() = {"", ""}
     Public connect_flag As Integer = 0
-    Public default_passKey As String = "w!fIdisable12334"
+    Public default_passKey As String = "w!fIdisable23"
 
     Enum ConnectState
         CONNECT_DEFAULT
-        CONNECT_PRIMARY
-        CONNECT_SECONDRY
+        CONNECT_NORMAL
         CONNECT_CUSTOM
     End Enum
 
-    Public connect_using As ConnectState = ConnectState.CONNECT_PRIMARY
+    Public connect_using As ConnectState = ConnectState.CONNECT_NORMAL
 
     Sub load()
         If My.Settings.ssidCollection Is Nothing Then
@@ -166,49 +165,61 @@ e104:
                 MsgBox("try to connect using primary..")
                 serviceHandler()
             End If
-            End If
+        End If
 
-            If Button2.Text.ToUpper() = "DISCONNECT" Then
-                ServiceController1.Stop()
-            End If
+        If Button2.Text.ToUpper() = "DISCONNECT" Then
+            ServiceController1.Stop()
+        End If
 
 
     End Sub
     Sub serviceHandler()
         Dim k = My.Settings.ssidCollection.Contains(curr_ssid)
         If Not My.Settings.ssidCollection.Contains(curr_ssid) Then
-            If connect_using = ConnectState.CONNECT_PRIMARY Then
+            If connect_using = ConnectState.CONNECT_NORMAL Then
                 MsgBox("connect using default")
                 connect_using = ConnectState.CONNECT_DEFAULT
             End If
+
+        Else
+            connect_using = ConnectState.CONNECT_NORMAL
         End If
 
         curr_passKey = getPassKey(curr_ssid)
-        startService(curr_ssid, curr_passKey)
+        startService(curr_ssid, curr_passKey(0), curr_passKey(1))
     End Sub
 
-    Function getPassKey(ByVal ssid As String) As String
-        Dim passKey As String = ""
+    Function getPassKey(ByVal ssid As String) As String()
+        Dim passKey As String() = {"", ""}
 
         Select Case connect_using
             Case ConnectState.CONNECT_DEFAULT
-                passKey = default_passKey
-            Case ConnectState.CONNECT_PRIMARY
+                MsgBox("connect default mode")
+                passKey(0) = default_passKey
+                'Case ConnectState.CONNECT_PRIMARY
+                '    If My.Settings.pryKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
+                '        passKey(0) = My.Settings.pryKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
+                '    End If
+                'Case ConnectState.CONNECT_SECONDRY
+                '    If My.Settings.secKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
+                '        passKey(0) = My.Settings.secKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
+                '    End If
+            Case ConnectState.CONNECT_NORMAL
+                MsgBox("connect normal mode")
                 If My.Settings.pryKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
-                    passKey = My.Settings.pryKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
+                    passKey(0) = My.Settings.pryKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
                 End If
-            Case ConnectState.CONNECT_SECONDRY
                 If My.Settings.secKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
-                    passKey = My.Settings.secKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
+                    passKey(1) = My.Settings.secKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
                 End If
             Case ConnectState.CONNECT_CUSTOM
-                passKey = InputBox("Please enter passkey")
+                MsgBox("connect custom mode")
+                passKey(0) = InputBox("Please enter passkey")
         End Select
-
         Return passKey
     End Function
 
-    Sub startService(ByVal curr_ssid As String, ByVal curr_passKey As String)
+    Sub startService(ByVal ssid As String, ByVal pKey As String, ByVal sKey As String)
         Try
             ServiceController1.ServiceName = "Quota2"
             Try
@@ -218,7 +229,7 @@ e104:
             End Try
 
             If Not ServiceController1.Status = ServiceControllerStatus.Running Then
-                ServiceController1.Start({curr_ssid, curr_passKey})
+                ServiceController1.Start({ssid, pKey, sKey})
             Else
                 ServiceController1.Stop()
             End If
@@ -252,11 +263,7 @@ e104:
         If e.Entry.Message = "#NOTCONNECTED" Then
             ServiceController1.Stop()
             Select Case connect_using
-                Case ConnectState.CONNECT_PRIMARY
-                    MsgBox("connection try with secondry")
-                    connect_using = ConnectState.CONNECT_SECONDRY
-                    serviceHandler()
-                Case ConnectState.CONNECT_SECONDRY
+                Case ConnectState.CONNECT_NORMAL
                     MsgBox("connection try with custom1")
                     connect_using = ConnectState.CONNECT_CUSTOM
                     serviceHandler()
@@ -265,7 +272,7 @@ e104:
                     connect_using = ConnectState.CONNECT_CUSTOM
                     serviceHandler()
                 Case ConnectState.CONNECT_CUSTOM
-                    connect_using = ConnectState.CONNECT_PRIMARY
+                    connect_using = ConnectState.CONNECT_NORMAL
             End Select
 
         End If

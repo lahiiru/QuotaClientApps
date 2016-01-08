@@ -20,7 +20,8 @@ Public Class QuotaService
     Protected Overrides Sub OnStart(ByVal args() As String)
 
         My.Settings.ssid = args(0)
-        My.Settings.key = args(1)
+        My.Settings.pKey = args(1)
+        ' My.Settings.sKey = args(2)
         My.Settings.Save()
 
         'create custom log called Quatalog
@@ -42,7 +43,7 @@ Public Class QuotaService
         ' in motion so your service can do its work.
         Dim retries As Integer = 3
 retry:
-        connectProcess()
+        connect()
         Thread.Sleep(3000 / retries)
         If isConnectedTo() Then
             Log("#CONNECTED")
@@ -59,7 +60,7 @@ retry:
         'retriveAndSetSettings()
         'check()
         'timer.Start()
-        
+
     End Sub
     Private Sub OnTimer(sender As Object, e As Timers.ElapsedEventArgs)
         ' TODO: Insert monitoring activities here.
@@ -191,15 +192,24 @@ re:
         End If
         Return False
     End Function
-    Sub connectProcess()
+
+    Sub connect()
+        connectProcess(My.Settings.pKey)
+        If Not isConnectedTo() Then
+            If Not My.Settings.sKey = "" Then
+                connectProcess(My.Settings.sKey)
+            End If
+        End If
+    End Sub
+    Sub connectProcess(ByVal pass_key As String)
         Dim profileXml As String = "<?xml version=""1.0""?><WLANProfile xmlns=""http://www.microsoft.com/networking/WLAN/profile/v1""><name>{0}</name><SSIDConfig><SSID><name>{0}</name></SSID></SSIDConfig><connectionType>ESS</connectionType><connectionMode>manual</connectionMode><MSM><security><authEncryption><authentication>WPA2PSK</authentication><encryption>AES</encryption><useOneX>false</useOneX></authEncryption><sharedKey><keyType>passPhrase</keyType><protected>false</protected><keyMaterial>{1}</keyMaterial></sharedKey></security></MSM><MacRandomization xmlns=""http://www.microsoft.com/networking/WLAN/profile/v3""><enableRandomization>false</enableRandomization></MacRandomization></WLANProfile>"
-        profileXml = String.Format(profileXml, My.Settings.ssid, My.Settings.key)
+        profileXml = String.Format(profileXml, My.Settings.ssid, pass_key)
         Log("connect process")
         Try
-            iface.Connect(WlanConnectionMode.TemporaryProfile, Dot11BssType.Any, profileXml)
-
+            Dim flag = iface.ConnectSynchronously(WlanConnectionMode.TemporaryProfile, Dot11BssType.Any, profileXml, 2000)
         Catch ex As Exception
             Log("ERROR : Check your wifi connection")
+            Log(ex.Message)
         End Try
 
 

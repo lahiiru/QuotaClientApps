@@ -66,63 +66,75 @@ Namespace My
             End Set
         End Property
         
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
-        Public Property key() As String
+        <Global.System.Configuration.UserScopedSettingAttribute(), _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.Configuration.DefaultSettingValueAttribute("")> _
+        Public Property pKey() As String
             Get
-                Return CType(Me("key"),String)
+                Return CType(Me("pKey"), String)
             End Get
-            Set
-                Me("key") = value
+            Set(value As String)
+                Me("pKey") = value
             End Set
         End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+
+        <Global.System.Configuration.UserScopedSettingAttribute(), _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")> _
         Public Property usage() As Integer
             Get
-                Return CType(Me("usage"),Integer)
+                Return CType(Me("usage"), Integer)
             End Get
-            Set
+            Set(value As Integer)
                 Me("usage") = value
             End Set
         End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+
+        <Global.System.Configuration.UserScopedSettingAttribute(), _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")> _
         Public Property pending() As Integer
             Get
-                Return CType(Me("pending"),Integer)
+                Return CType(Me("pending"), Integer)
             End Get
-            Set
+            Set(value As Integer)
                 Me("pending") = value
             End Set
         End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+
+        <Global.System.Configuration.UserScopedSettingAttribute(), _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")> _
         Public Property quota() As Integer
             Get
-                Return CType(Me("quota"),Integer)
+                Return CType(Me("quota"), Integer)
             End Get
-            Set
+            Set(value As Integer)
                 Me("quota") = value
             End Set
         End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+
+        <Global.System.Configuration.UserScopedSettingAttribute(), _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")> _
         Public Property blocked() As Integer
             Get
-                Return CType(Me("blocked"),Integer)
+                Return CType(Me("blocked"), Integer)
             End Get
-            Set
+            Set(value As Integer)
                 Me("blocked") = value
+            End Set
+        End Property
+
+        <Global.System.Configuration.UserScopedSettingAttribute(), _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.Configuration.DefaultSettingValueAttribute("")> _
+        Public Property sKey() As String
+            Get
+                Return CType(Me("sKey"), String)
+            End Get
+            Set(value As String)
+                Me("sKey") = value
             End Set
         End Property
     End Class
