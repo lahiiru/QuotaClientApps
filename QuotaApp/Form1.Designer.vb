@@ -52,6 +52,8 @@ Partial Class Form1
         Me.ServiceController1 = New System.ServiceProcess.ServiceController()
         Me.Button4 = New System.Windows.Forms.Button()
         Me.cmbSSID = New System.Windows.Forms.ComboBox()
+        Me.Button5 = New System.Windows.Forms.Button()
+        Me.Button6 = New System.Windows.Forms.Button()
         CType(Me.EventLog1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
@@ -293,11 +295,31 @@ Partial Class Form1
         Me.cmbSSID.Size = New System.Drawing.Size(143, 21)
         Me.cmbSSID.TabIndex = 22
         '
+        'Button5
+        '
+        Me.Button5.Location = New System.Drawing.Point(456, 314)
+        Me.Button5.Name = "Button5"
+        Me.Button5.Size = New System.Drawing.Size(75, 23)
+        Me.Button5.TabIndex = 23
+        Me.Button5.Text = "CLEAR"
+        Me.Button5.UseVisualStyleBackColor = True
+        '
+        'Button6
+        '
+        Me.Button6.Location = New System.Drawing.Point(537, 314)
+        Me.Button6.Name = "Button6"
+        Me.Button6.Size = New System.Drawing.Size(75, 23)
+        Me.Button6.TabIndex = 24
+        Me.Button6.Text = "CHANGE"
+        Me.Button6.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(612, 370)
+        Me.Controls.Add(Me.Button6)
+        Me.Controls.Add(Me.Button5)
         Me.Controls.Add(Me.cmbSSID)
         Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.Button2)
@@ -356,4 +378,6 @@ Partial Class Form1
     Friend WithEvents ToolStripStatusLabel3 As ToolStripStatusLabel
     Friend WithEvents Button4 As System.Windows.Forms.Button
     Friend WithEvents cmbSSID As System.Windows.Forms.ComboBox
+    Friend WithEvents Button6 As System.Windows.Forms.Button
+    Friend WithEvents Button5 As System.Windows.Forms.Button
 End Class

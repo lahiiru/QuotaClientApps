@@ -10,7 +10,7 @@ Public Class Form1
     Public curr_ssid As String
     Public curr_passKey As String
     Public connect_flag As Integer = 0
-    Public default_passKey As String = "w!fIdisable123"
+    Public default_passKey As String = "w!fIdisable12334"
 
     Enum ConnectState
         CONNECT_DEFAULT
@@ -250,6 +250,7 @@ e104:
         End If
 
         If e.Entry.Message = "#NOTCONNECTED" Then
+            ServiceController1.Stop()
             Select Case connect_using
                 Case ConnectState.CONNECT_PRIMARY
                     MsgBox("connection try with secondry")
@@ -265,7 +266,6 @@ e104:
                     serviceHandler()
                 Case ConnectState.CONNECT_CUSTOM
                     connect_using = ConnectState.CONNECT_PRIMARY
-                    ServiceController1.Stop()
             End Select
 
         End If
@@ -325,4 +325,25 @@ e104:
 
         Return encoded_str
     End Function
+
+    Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
+        My.Settings.ssidCollection.Clear()
+        My.Settings.pryKeyCollection.Clear()
+        My.Settings.secKeyCollection.Clear()
+        My.Settings.Save()
+
+    End Sub
+
+    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+        My.Settings.ssidCollection.Add("buhua")
+        My.Settings.ssidCollection.Add("hdhdhdh")
+        My.Settings.pryKeyCollection.Add("elaaa")
+        My.Settings.pryKeyCollection.Add("2323")
+        My.Settings.secKeyCollection.Add("2323")
+        My.Settings.secKeyCollection.Add("w!")
+        My.Settings.Save()
+        MsgBox("settings changed")
+
+
+    End Sub
 End Class
