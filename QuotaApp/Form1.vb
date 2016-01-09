@@ -354,50 +354,75 @@ e104:
     End Sub
 
     Private Sub btnProfile_Click(sender As Object, e As EventArgs) Handles btnProfile.Click
-        btnProfile.FlatStyle = FlatStyle.Flat
-        btnProfile.FlatAppearance.BorderSize = 0
+        btnProfile.BackColor = Color.FromArgb(219, 219, 219)
+        btnChangePackage.BackColor = Color.FromArgb(197, 197, 197)
+        btnOffer.BackColor = Color.FromArgb(197, 197, 197)
+        btnWant.BackColor = Color.FromArgb(197, 197, 197)
+        btnMessage.BackColor = Color.FromArgb(197, 197, 197)
+        btnPayment.BackColor = Color.FromArgb(197, 197, 197)
 
-        btnChangePackage.FlatStyle = FlatStyle.Standard
-        btnOffer.FlatStyle = FlatStyle.Standard
-        btnWant.FlatStyle = FlatStyle.Standard
-        btnMessage.FlatStyle = FlatStyle.Standard
+        tabControl.SelectedIndex = 0
+
+
     End Sub
 
     Private Sub btnChangePackage_Click(sender As Object, e As EventArgs) Handles btnChangePackage.Click
-        btnProfile.FlatStyle = FlatStyle.Standard
-        btnChangePackage.FlatStyle = FlatStyle.Flat
-        btnChangePackage.FlatAppearance.BorderSize = 0
+        btnProfile.BackColor = Color.FromArgb(197, 197, 197)
+        btnChangePackage.BackColor = Color.FromArgb(219, 219, 219)
+        btnOffer.BackColor = Color.FromArgb(197, 197, 197)
+        btnWant.BackColor = Color.FromArgb(197, 197, 197)
+        btnMessage.BackColor = Color.FromArgb(197, 197, 197)
+        btnPayment.BackColor = Color.FromArgb(197, 197, 197)
 
-        btnOffer.FlatStyle = FlatStyle.Standard
-        btnWant.FlatStyle = FlatStyle.Standard
-        btnMessage.FlatStyle = FlatStyle.Standard
+        tabControl.SelectedIndex = 1
+
     End Sub
 
     Private Sub btnOffer_Click(sender As Object, e As EventArgs) Handles btnOffer.Click
-        btnProfile.FlatStyle = FlatStyle.Standard
-        btnChangePackage.FlatStyle = FlatStyle.Standard
-        btnOffer.FlatStyle = FlatStyle.Flat
-        btnOffer.FlatAppearance.BorderSize = 0
+        btnProfile.BackColor = Color.FromArgb(197, 197, 197)
+        btnChangePackage.BackColor = Color.FromArgb(197, 197, 197)
+        btnOffer.BackColor = Color.FromArgb(219, 219, 219)
+        btnWant.BackColor = Color.FromArgb(197, 197, 197)
+        btnMessage.BackColor = Color.FromArgb(197, 197, 197)
+        btnPayment.BackColor = Color.FromArgb(197, 197, 197)
 
-        btnWant.FlatStyle = FlatStyle.Standard
-        btnMessage.FlatStyle = FlatStyle.Standard
+        tabControl.SelectedIndex = 2
+
     End Sub
 
     Private Sub btnWant_Click(sender As Object, e As EventArgs) Handles btnWant.Click
-        btnProfile.FlatStyle = FlatStyle.Standard
-        btnChangePackage.FlatStyle = FlatStyle.Standard
-        btnOffer.FlatStyle = FlatStyle.Standard
-        btnWant.FlatStyle = FlatStyle.Flat
-        btnWant.FlatAppearance.BorderSize = 0
-        btnMessage.FlatStyle = FlatStyle.Standard
+        btnProfile.BackColor = Color.FromArgb(197, 197, 197)
+        btnChangePackage.BackColor = Color.FromArgb(197, 197, 197)
+        btnOffer.BackColor = Color.FromArgb(197, 197, 197)
+        btnWant.BackColor = Color.FromArgb(219, 219, 219)
+        btnMessage.BackColor = Color.FromArgb(197, 197, 197)
+        btnPayment.BackColor = Color.FromArgb(197, 197, 197)
+
+        tabControl.SelectedIndex = 3
+
     End Sub
 
     Private Sub btnMessage_Click(sender As Object, e As EventArgs) Handles btnMessage.Click
-        btnProfile.FlatStyle = FlatStyle.Standard
-        btnChangePackage.FlatStyle = FlatStyle.Standard
-        btnOffer.FlatStyle = FlatStyle.Standard
-        btnWant.FlatStyle = FlatStyle.Standard
-        btnMessage.FlatStyle = FlatStyle.Flat
-        btnMessage.FlatAppearance.BorderSize = 0
+        btnProfile.BackColor = Color.FromArgb(197, 197, 197)
+        btnChangePackage.BackColor = Color.FromArgb(197, 197, 197)
+        btnOffer.BackColor = Color.FromArgb(197, 197, 197)
+        btnWant.BackColor = Color.FromArgb(197, 197, 197)
+        btnMessage.BackColor = Color.FromArgb(219, 219, 219)
+        btnPayment.BackColor = Color.FromArgb(197, 197, 197)
+
+        tabControl.SelectedIndex = 4
+
+    End Sub
+
+    Private Sub btnPayment_Click(sender As Object, e As EventArgs) Handles btnPayment.Click
+        btnProfile.BackColor = Color.FromArgb(197, 197, 197)
+        btnChangePackage.BackColor = Color.FromArgb(197, 197, 197)
+        btnOffer.BackColor = Color.FromArgb(197, 197, 197)
+        btnWant.BackColor = Color.FromArgb(197, 197, 197)
+        btnMessage.BackColor = Color.FromArgb(197, 197, 197)
+        btnPayment.BackColor = Color.FromArgb(219, 219, 219)
+
+        tabControl.SelectedIndex = 5
+
     End Sub
 End Class
