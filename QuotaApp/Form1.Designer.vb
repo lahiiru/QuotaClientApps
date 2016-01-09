@@ -37,33 +37,33 @@ Partial Class Form1
         Me.cmbSSID = New System.Windows.Forms.ComboBox()
         Me.tabControl = New System.Windows.Forms.TabControl()
         Me.tabProfile = New System.Windows.Forms.TabPage()
-        Me.Button6 = New System.Windows.Forms.Button()
-        Me.Button5 = New System.Windows.Forms.Button()
-        Me.Button4 = New System.Windows.Forms.Button()
-        Me.Button3 = New System.Windows.Forms.Button()
-        Me.TextBox1 = New System.Windows.Forms.TextBox()
-        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Label11 = New System.Windows.Forms.Label()
+        Me.Button6 = New System.Windows.Forms.Button()
         Me.Label9 = New System.Windows.Forms.Label()
+        Me.Button5 = New System.Windows.Forms.Button()
         Me.Label10 = New System.Windows.Forms.Label()
+        Me.Button4 = New System.Windows.Forms.Button()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.Button3 = New System.Windows.Forms.Button()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Label16 = New System.Windows.Forms.Label()
         Me.tabChnageMyPackage = New System.Windows.Forms.TabPage()
+        Me.tabOffer = New System.Windows.Forms.TabPage()
+        Me.tabWant = New System.Windows.Forms.TabPage()
+        Me.tabMessage = New System.Windows.Forms.TabPage()
+        Me.tabPayments = New System.Windows.Forms.TabPage()
+        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         Me.btnProfile = New System.Windows.Forms.Button()
         Me.btnChangePackage = New System.Windows.Forms.Button()
         Me.btnOffer = New System.Windows.Forms.Button()
         Me.btnWant = New System.Windows.Forms.Button()
         Me.btnMessage = New System.Windows.Forms.Button()
         Me.btnPayment = New System.Windows.Forms.Button()
-        Me.tabOffer = New System.Windows.Forms.TabPage()
-        Me.tabWant = New System.Windows.Forms.TabPage()
-        Me.tabMessage = New System.Windows.Forms.TabPage()
-        Me.tabPayments = New System.Windows.Forms.TabPage()
         CType(Me.EventLog1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -190,41 +190,13 @@ Partial Class Form1
         Me.tabProfile.TabIndex = 0
         Me.tabProfile.Text = "TabPage1"
         '
-        'Button6
+        'Label6
         '
-        Me.Button6.Location = New System.Drawing.Point(387, 238)
-        Me.Button6.Name = "Button6"
-        Me.Button6.Size = New System.Drawing.Size(75, 23)
-        Me.Button6.TabIndex = 34
-        Me.Button6.Text = "CHANGE"
-        Me.Button6.UseVisualStyleBackColor = True
-        '
-        'Button5
-        '
-        Me.Button5.Location = New System.Drawing.Point(310, 236)
-        Me.Button5.Name = "Button5"
-        Me.Button5.Size = New System.Drawing.Size(75, 23)
-        Me.Button5.TabIndex = 33
-        Me.Button5.Text = "CLEAR"
-        Me.Button5.UseVisualStyleBackColor = True
-        '
-        'Button4
-        '
-        Me.Button4.Location = New System.Drawing.Point(229, 236)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(75, 23)
-        Me.Button4.TabIndex = 32
-        Me.Button4.Text = "Button4"
-        Me.Button4.UseVisualStyleBackColor = True
-        '
-        'Button3
-        '
-        Me.Button3.Location = New System.Drawing.Point(138, 236)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(85, 23)
-        Me.Button3.TabIndex = 30
-        Me.Button3.Text = "Update"
-        Me.Button3.UseVisualStyleBackColor = True
+        Me.Label6.Location = New System.Drawing.Point(44, 34)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(66, 23)
+        Me.Label6.TabIndex = 10
+        Me.Label6.Text = "Remaining"
         '
         'TextBox1
         '
@@ -239,24 +211,6 @@ Partial Class Form1
         Me.TextBox1.TabIndex = 0
         Me.TextBox1.Text = "No announcements"
         '
-        'LinkLabel1
-        '
-        Me.LinkLabel1.AutoSize = True
-        Me.LinkLabel1.Location = New System.Drawing.Point(448, 468)
-        Me.LinkLabel1.Name = "LinkLabel1"
-        Me.LinkLabel1.Size = New System.Drawing.Size(165, 13)
-        Me.LinkLabel1.TabIndex = 27
-        Me.LinkLabel1.TabStop = True
-        Me.LinkLabel1.Text = "http://edu.wearetrying.info/quota"
-        '
-        'Label6
-        '
-        Me.Label6.Location = New System.Drawing.Point(44, 34)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(66, 23)
-        Me.Label6.TabIndex = 10
-        Me.Label6.Text = "Remaining"
-        '
         'Label11
         '
         Me.Label11.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -266,12 +220,30 @@ Partial Class Form1
         Me.Label11.TabIndex = 11
         Me.Label11.Text = "No"
         '
+        'Button6
+        '
+        Me.Button6.Location = New System.Drawing.Point(391, 236)
+        Me.Button6.Name = "Button6"
+        Me.Button6.Size = New System.Drawing.Size(75, 23)
+        Me.Button6.TabIndex = 34
+        Me.Button6.Text = "CHANGE"
+        Me.Button6.UseVisualStyleBackColor = True
+        '
         'Label9
         '
         Me.Label9.Location = New System.Drawing.Point(116, 80)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(87, 23)
         Me.Label9.TabIndex = 12
+        '
+        'Button5
+        '
+        Me.Button5.Location = New System.Drawing.Point(310, 236)
+        Me.Button5.Name = "Button5"
+        Me.Button5.Size = New System.Drawing.Size(75, 23)
+        Me.Button5.TabIndex = 33
+        Me.Button5.Text = "CLEAR"
+        Me.Button5.UseVisualStyleBackColor = True
         '
         'Label10
         '
@@ -281,6 +253,15 @@ Partial Class Form1
         Me.Label10.TabIndex = 13
         Me.Label10.Text = "Blacklisted"
         '
+        'Button4
+        '
+        Me.Button4.Location = New System.Drawing.Point(229, 236)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(75, 23)
+        Me.Button4.TabIndex = 32
+        Me.Button4.Text = "Button4"
+        Me.Button4.UseVisualStyleBackColor = True
+        '
         'Label8
         '
         Me.Label8.Location = New System.Drawing.Point(44, 80)
@@ -288,6 +269,15 @@ Partial Class Form1
         Me.Label8.Size = New System.Drawing.Size(66, 23)
         Me.Label8.TabIndex = 14
         Me.Label8.Text = "Expired on"
+        '
+        'Button3
+        '
+        Me.Button3.Location = New System.Drawing.Point(138, 236)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(85, 23)
+        Me.Button3.TabIndex = 30
+        Me.Button3.Text = "Update"
+        Me.Button3.UseVisualStyleBackColor = True
         '
         'Label5
         '
@@ -340,6 +330,56 @@ Partial Class Form1
         Me.tabChnageMyPackage.Size = New System.Drawing.Size(506, 269)
         Me.tabChnageMyPackage.TabIndex = 1
         Me.tabChnageMyPackage.Text = "TabPage2"
+        '
+        'tabOffer
+        '
+        Me.tabOffer.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.tabOffer.Location = New System.Drawing.Point(4, 25)
+        Me.tabOffer.Name = "tabOffer"
+        Me.tabOffer.Padding = New System.Windows.Forms.Padding(3)
+        Me.tabOffer.Size = New System.Drawing.Size(506, 269)
+        Me.tabOffer.TabIndex = 2
+        Me.tabOffer.Text = "TabPage3"
+        '
+        'tabWant
+        '
+        Me.tabWant.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.tabWant.Location = New System.Drawing.Point(4, 25)
+        Me.tabWant.Name = "tabWant"
+        Me.tabWant.Padding = New System.Windows.Forms.Padding(3)
+        Me.tabWant.Size = New System.Drawing.Size(506, 269)
+        Me.tabWant.TabIndex = 3
+        Me.tabWant.Text = "TabPage4"
+        '
+        'tabMessage
+        '
+        Me.tabMessage.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.tabMessage.Location = New System.Drawing.Point(4, 25)
+        Me.tabMessage.Name = "tabMessage"
+        Me.tabMessage.Padding = New System.Windows.Forms.Padding(3)
+        Me.tabMessage.Size = New System.Drawing.Size(506, 269)
+        Me.tabMessage.TabIndex = 4
+        Me.tabMessage.Text = "TabPage5"
+        '
+        'tabPayments
+        '
+        Me.tabPayments.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.tabPayments.Location = New System.Drawing.Point(4, 25)
+        Me.tabPayments.Name = "tabPayments"
+        Me.tabPayments.Padding = New System.Windows.Forms.Padding(3)
+        Me.tabPayments.Size = New System.Drawing.Size(506, 269)
+        Me.tabPayments.TabIndex = 5
+        Me.tabPayments.Text = "TabPage6"
+        '
+        'LinkLabel1
+        '
+        Me.LinkLabel1.AutoSize = True
+        Me.LinkLabel1.Location = New System.Drawing.Point(448, 468)
+        Me.LinkLabel1.Name = "LinkLabel1"
+        Me.LinkLabel1.Size = New System.Drawing.Size(165, 13)
+        Me.LinkLabel1.TabIndex = 27
+        Me.LinkLabel1.TabStop = True
+        Me.LinkLabel1.Text = "http://edu.wearetrying.info/quota"
         '
         'btnProfile
         '
@@ -424,46 +464,6 @@ Partial Class Form1
         Me.btnPayment.TabIndex = 29
         Me.btnPayment.Text = "My payments"
         Me.btnPayment.UseVisualStyleBackColor = False
-        '
-        'tabOffer
-        '
-        Me.tabOffer.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.tabOffer.Location = New System.Drawing.Point(4, 25)
-        Me.tabOffer.Name = "tabOffer"
-        Me.tabOffer.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabOffer.Size = New System.Drawing.Size(506, 269)
-        Me.tabOffer.TabIndex = 2
-        Me.tabOffer.Text = "TabPage3"
-        '
-        'tabWant
-        '
-        Me.tabWant.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.tabWant.Location = New System.Drawing.Point(4, 25)
-        Me.tabWant.Name = "tabWant"
-        Me.tabWant.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabWant.Size = New System.Drawing.Size(506, 269)
-        Me.tabWant.TabIndex = 3
-        Me.tabWant.Text = "TabPage4"
-        '
-        'tabMessage
-        '
-        Me.tabMessage.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.tabMessage.Location = New System.Drawing.Point(4, 25)
-        Me.tabMessage.Name = "tabMessage"
-        Me.tabMessage.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabMessage.Size = New System.Drawing.Size(506, 269)
-        Me.tabMessage.TabIndex = 4
-        Me.tabMessage.Text = "TabPage5"
-        '
-        'tabPayments
-        '
-        Me.tabPayments.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.tabPayments.Location = New System.Drawing.Point(4, 25)
-        Me.tabPayments.Name = "tabPayments"
-        Me.tabPayments.Padding = New System.Windows.Forms.Padding(3)
-        Me.tabPayments.Size = New System.Drawing.Size(506, 269)
-        Me.tabPayments.TabIndex = 5
-        Me.tabPayments.Text = "TabPage6"
         '
         'Form1
         '

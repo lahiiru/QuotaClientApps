@@ -31,11 +31,16 @@ Module Main
 
         myLog.Log = "QuotaLog"
         AddHandler myLog.EntryWritten, AddressOf mainForm.processLog
-        myLog.EnableRaisingEvents = True
+        Try
+            myLog.EnableRaisingEvents = True
+        Catch ex As Exception
+
+        End Try
+
         'On Error GoTo e109
 
         mainForm.ServiceController1.ServiceName = serviceName
-        mainForm.load()
+        mainForm.loadForm()
         mainForm.Timer1.Enabled = True
         slash.Hide()
         'On Error Resume Next

@@ -17,7 +17,7 @@ Public Class QuotaService
     Public myLog As New EventLog()
     ' Set up a timer to trigger every minute.
     Public timer As System.Timers.Timer = New System.Timers.Timer()
-
+    Private irregularStop As Boolean = False 'whether the stop is not healthy or not
     Private ssid As String
     Private pKey As String
     Private skey As String
@@ -63,11 +63,12 @@ retry:
             usercheck()
         ElseIf retries > 1 Then
             retries = retries - 1
-            Log("Connecting uploading tries " & retries)
+            Log("Connecting retries " & retries)
             GoTo retry
         Else
             Log("#NOTCONNECTED")
-
+            irregularStop = True
+            Me.Stop()
         End If
 
         'retriveAndSetSettings()
@@ -101,13 +102,14 @@ retry:
         ElseIf (json.SelectToken("status") = "BLOCKED") Then
             Log("#MSG:You are blacklisted")
             Log("#UPDATE:" & response)
-            disconnect()
+            Me.Stop()
         ElseIf (json.SelectToken("status") = "OVER") Then
             Log("#MSG:Your remaining quota is less than 1Mb")
             Log("#UPDATE:" & response)
-            disconnect()
+            Me.Stop()
         ElseIf (json.SelectToken("status") = "ERROR") Then
             Log("#MSG:Internal server error occured")
+            Me.Stop()
         End If
         Return False
         Exit Function
@@ -128,22 +130,10 @@ err:
         End If
     End Sub
     Protected Overrides Sub OnShutdown()
-        Log("Shutting down")
-        prepareUsage()
-        preparePending()
+
     End Sub
     Sub Log(msg As String)
         myLog.WriteEntry(msg)
-    End Sub
-    Sub check()
-        If My.Settings.quota < 1000 Or My.Settings.blocked = 1 Then
-            disconnect()
-            If My.Settings.quota < 1000 Then
-                Log("Your  quota is less than 1Mb")
-            Else
-                Log("You are blacklisted!")
-            End If
-        End If
     End Sub
     Sub retriveAndSetSettings()
         Dim arr As String() = downloadData()
@@ -234,7 +224,7 @@ re:
     End Function
     Sub disconnect()
         Dim x = 0
-        While My.Computer.Network.IsAvailable And x < 50 And isConnectedTo()
+        While x < 50 And isConnectedTo()
             disconnectProcess()
             Threading.Thread.Sleep(500)
             x = x + 1
@@ -248,7 +238,10 @@ re:
         Log("Stopping")
         prepareUsage()
         preparePending()
-        uploadData()
+        If Not irregularStop Then
+            Log("auto stop")
+            uploadData()
+        End If
         disconnect()
         My.Settings.Save()
         ' Add code here to perform any tear-down necessary to stop your service.
@@ -263,5 +256,6 @@ re:
     Sub preparePending()
         My.Settings.pending = My.Settings.pending + My.Settings.usage
         My.Settings.usage = 0
+
     End Sub
 End Class

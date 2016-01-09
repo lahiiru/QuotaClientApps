@@ -11,7 +11,8 @@ Public Class Form1
     Public curr_ssid As String
     Public curr_passKey As String() = {"", ""}      'primary and secondry passkeys
     Public default_passKey As String = "w!fIdisable23"      'default passkey
-
+    Private inactive_color As Color = Color.FromArgb(197, 197, 197)
+    Private active_color As Color = Color.FromArgb(219, 219, 219)
     'connection method states
     Enum ConnectState
         CONNECT_DEFAULT
@@ -22,7 +23,7 @@ Public Class Form1
     'connection state variable
     Public connect_using As ConnectState = ConnectState.CONNECT_NORMAL
 
-    Sub load()
+    Sub loadForm()
         If My.Settings.ssidCollection Is Nothing Then
             My.Settings.ssidCollection = New Specialized.StringCollection
         End If
@@ -33,15 +34,13 @@ Public Class Form1
             My.Settings.secKeyCollection = New Specialized.StringCollection
         End If
 
-        If My.Computer.Network.IsAvailable Then
-            retriveData()
-        End If
         On Error Resume Next
         Label2.Text = (My.Settings.quota / 1024.0).ToString("N2") & " Mb"
         TextBox1.Text = My.Settings.comment.Replace("<br>", vbNewLine)
         Label4.Text = (My.Settings.fullquota / 1000.0).ToString("N2") & " Mb"
         Label9.Text = My.Settings.expiry.Split(" ")(0)
         ToolStripStatusLabel3.Text = My.Settings.bssid
+
         If My.Settings.blocked = 1 Then
             Label11.Text = "YES"
             Label11.ForeColor = Color.Brown
@@ -49,56 +48,10 @@ Public Class Form1
             Label11.Text = "No"
             Label11.ForeColor = Color.DarkGreen
         End If
+
         Button1.Enabled = True
         fillSSIDList()
 
-    End Sub
-    Function getDetails() As String()
-        Dim url As String = requestHandler & "req=get"
-        Dim tries As Integer = 0
-re:
-        Dim response As String = WebRequest.DownloadString(url)
-        If response.Split(";").Count < 4 Then
-            Threading.Thread.Sleep(1000)
-            tries = tries + 1
-            If tries > 5 Then
-                MsgBox("Unable retrive data from server.", MsgBoxStyle.Exclamation, "Error")
-                End
-            End If
-            GoTo re
-        End If
-        Return response.Split(";")
-    End Function
-    Function check() As Boolean
-        If My.Settings.quota < 1000 Or My.Settings.blocked = 1 Then
-            If My.Settings.quota < 1000 Then
-                MsgBox("Your  quota is less than 1Mb", MsgBoxStyle.Exclamation, "Can't connect")
-            Else
-                MsgBox("You are blacklisted!", MsgBoxStyle.Exclamation, "Can't connect")
-            End If
-            Return False
-        End If
-        Return True
-    End Function
-    Public Sub retriveData()
-        On Error GoTo e103
-        Dim arr As String() = getDetails()
-        On Error GoTo e104
-        My.Settings.quota = Val(arr(0))
-        My.Settings.fullquota = Val(arr(1))
-        My.Settings.comment = arr(2)
-        My.Settings.blocked = arr(3)
-        My.Settings.expiry = arr(4)
-        My.Settings.passkey = arr(5)
-        My.Settings.name = arr(6)
-        My.Settings.Save()
-        'MsgBox("Your have " & CInt(My.Settings.quota / 1024).ToString("N2") & "Mb remaining.", MsgBoxStyle.Information, "Connected.")
-        Exit Sub
-e103:
-        MsgBox("Error 103 occured!" & Err.Description & vbNewLine & Err.Source, MsgBoxStyle.Exclamation, "Error")
-        Exit Sub
-e104:
-        MsgBox("Error 104 occured!" & Err.Description & vbNewLine & Err.Source, MsgBoxStyle.Exclamation, "Error")
     End Sub
     Function isConnectedTo()
         If wlanIface.CurrentConnection.profileName.Contains(My.Settings.bssid.ToUpper()) Then
@@ -106,7 +59,6 @@ e104:
         End If
         Return False
     End Function
-
     Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
         Dim sInfo As New ProcessStartInfo("http://edu.wearetrying.info/quota")
         Process.Start(sInfo)
@@ -182,16 +134,19 @@ e104:
 
     'handle the service while connecting -- send passwords to service and try to connect
     Sub serviceHandler()
-        Dim k = My.Settings.ssidCollection.Contains(curr_ssid)
         If Not My.Settings.ssidCollection.Contains(curr_ssid) And connect_using = ConnectState.CONNECT_NORMAL Then
-            If connect_using = ConnectState.CONNECT_NORMAL Then
-                MsgBox("connect using default")
-                connect_using = ConnectState.CONNECT_DEFAULT
-            End If
+            MsgBox("connect using default")
+            connect_using = ConnectState.CONNECT_DEFAULT
         End If
 
         curr_passKey = getPassKey(curr_ssid)
-        startService(curr_ssid, curr_passKey(0), curr_passKey(1))
+
+
+        If curr_passKey.Length < 5 And connect_using = ConnectState.CONNECT_CUSTOM Then
+            connect_using = ConnectState.CONNECT_NORMAL 'handles user input key errors
+        Else
+            startService(curr_ssid, curr_passKey(0), curr_passKey(1))
+        End If
     End Sub
 
     'get passkeys according to states DIFAULT / NORMAL / CUSTOM
@@ -212,7 +167,8 @@ e104:
                 End If
             Case ConnectState.CONNECT_CUSTOM
                 MsgBox("connect custom mode")
-                passKey(0) = InputBox("Please enter passkey")
+                Dim result = InputBox("Please enter passkey")
+                passKey(0) = result
         End Select
         Return passKey
     End Function
@@ -240,42 +196,31 @@ e104:
         Dim json As JObject = JObject.Parse("{'status':'OK','details':{'name':'Lahiru Slave','package':5000000,'usage':'332345'}}")
         MsgBox(json.SelectToken("details").SelectToken("name"))
     End Sub
-    Sub connectProcess()
-        Dim profileXml As String = "<?xml version=""1.0""?><WLANProfile xmlns=""http://www.microsoft.com/networking/WLAN/profile/v1"">       <name>{0}</name>       <SSIDConfig>       <SSID>       <name>{0}</name>       </SSID>       </SSIDConfig>       <connectionType>ESS</connectionType>       <connectionMode>manual</connectionMode>       <MSM>       <security>       <authEncryption>       <authentication>WPA2PSK</authentication>       <encryption>AES</encryption>       <useOneX>false</useOneX>       </authEncryption>       <sharedKey>       <keyType>passPhrase</keyType>       <protected>false</protected>       <keyMaterial>{1}</keyMaterial>       </sharedKey>       </security>       </MSM>       <MacRandomization xmlns=""http://www.microsoft.com/networking/WLAN/profile/v3"">       <enableRandomization>false</enableRandomization>       </MacRandomization>       </WLANProfile>"
-        profileXml = String.Format(profileXml, "NO FREE", "w!fIdisable123")
-        iface.Connect(WlanConnectionMode.TemporaryProfile, Dot11BssType.Any, profileXml)
-    End Sub
-
-    Private Sub Button4_Click(sender As Object, e As EventArgs)
-        connectProcess()
-    End Sub
-
     Public Sub processLog(ByVal [source] As Object, ByVal e As EntryWrittenEventArgs)
-        MsgBox(e.Entry.Message)
-        If e.Entry.Message = "#CONNECTED" Then
-            If Not My.Settings.ssidCollection.Contains(curr_ssid) Then
-                MsgBox("you are connectd using default key")
+        With e.Entry
+            MsgBox(.Message)
+            If .Message.Contains("#CONNECTED") Then
+                If Not My.Settings.ssidCollection.Contains(curr_ssid) Then
+                    MsgBox("you are connectd using default key")
+                End If
             End If
-        End If
 
-        If e.Entry.Message = "#NOTCONNECTED" Then
-            MsgBox("service going to stop")
-            ServiceController1.Stop()
-            Select Case connect_using
-                Case ConnectState.CONNECT_NORMAL
-                    MsgBox("connection try with custom1")
-                    connect_using = ConnectState.CONNECT_CUSTOM
-                    serviceHandler()
-                Case ConnectState.CONNECT_DEFAULT
-                    MsgBox("connection try with custom2")
-                    connect_using = ConnectState.CONNECT_CUSTOM
-                    serviceHandler()
-                Case ConnectState.CONNECT_CUSTOM
-                    connect_using = ConnectState.CONNECT_NORMAL
-            End Select
-
-        End If
-
+            If .Message.Contains("#NOTCONNECTED") Then
+                Select Case connect_using
+                    Case ConnectState.CONNECT_NORMAL
+                        MsgBox("kalin nam connect una me ssid eken ada bene. wena key ekak try karamuda?")
+                        connect_using = ConnectState.CONNECT_CUSTOM
+                        serviceHandler()
+                    Case ConnectState.CONNECT_DEFAULT
+                        MsgBox("me ssid ekta kalin connect wela ne. ssid ekata ena default key eken try kala hari gye ne. wena key ekak dannawada?")
+                        connect_using = ConnectState.CONNECT_CUSTOM
+                        serviceHandler()
+                    Case ConnectState.CONNECT_CUSTOM
+                        MsgBox("connect wenna beri wela oyata passwrd ekak gahanna qwa eka wedat ne. sorry tamai")
+                        connect_using = ConnectState.CONNECT_NORMAL
+                End Select
+            End If
+        End With
 
 
     End Sub
@@ -295,18 +240,18 @@ e104:
     End Sub
 
     Private Shared Function Encode(ssid As String) As String
-        Dim upper As String() = {"A", "B", "C", "D", "E", "F", _
-            "G", "H", "I", "J", "K", "L", _
-            "M", "N", "O", "P", "Q", "R", _
-            "S", "T", "U", "V", "W", "X", _
+        Dim upper As String() = {"A", "B", "C", "D", "E", "F",
+            "G", "H", "I", "J", "K", "L",
+            "M", "N", "O", "P", "Q", "R",
+            "S", "T", "U", "V", "W", "X",
             "Y", "Z"}
-        Dim lower As String() = {"a", "b", "c", "d", "e", "f", _
-            "g", "h", "i", "j", "k", "l", _
-            "m", "n", "o", "p", "q", "r", _
-            "s", "t", "u", "v", "w", "x", _
+        Dim lower As String() = {"a", "b", "c", "d", "e", "f",
+            "g", "h", "i", "j", "k", "l",
+            "m", "n", "o", "p", "q", "r",
+            "s", "t", "u", "v", "w", "x",
             "y", "z"}
         Dim symbols As String() = {"*", "#", "$", "&", "%"}
-        Dim numbers As Integer() = {0, 1, 2, 3, 4, 5, _
+        Dim numbers As Integer() = {0, 1, 2, 3, 4, 5,
             6, 7, 8, 9}
 
         Dim encode__1 As String = ssid
@@ -349,17 +294,15 @@ e104:
         My.Settings.secKeyCollection.Add("w!fIdisable13")
         My.Settings.Save()
         MsgBox("settings changed")
-
-
     End Sub
 
     Private Sub btnProfile_Click(sender As Object, e As EventArgs) Handles btnProfile.Click
-        btnProfile.BackColor = Color.FromArgb(219, 219, 219)
-        btnChangePackage.BackColor = Color.FromArgb(197, 197, 197)
-        btnOffer.BackColor = Color.FromArgb(197, 197, 197)
-        btnWant.BackColor = Color.FromArgb(197, 197, 197)
-        btnMessage.BackColor = Color.FromArgb(197, 197, 197)
-        btnPayment.BackColor = Color.FromArgb(197, 197, 197)
+        btnProfile.BackColor = active_color
+        btnChangePackage.BackColor = inactive_color
+        btnOffer.BackColor = inactive_color
+        btnWant.BackColor = inactive_color
+        btnMessage.BackColor = inactive_color
+        btnPayment.BackColor = inactive_color
 
         tabControl.SelectedIndex = 0
 
@@ -367,60 +310,60 @@ e104:
     End Sub
 
     Private Sub btnChangePackage_Click(sender As Object, e As EventArgs) Handles btnChangePackage.Click
-        btnProfile.BackColor = Color.FromArgb(197, 197, 197)
-        btnChangePackage.BackColor = Color.FromArgb(219, 219, 219)
-        btnOffer.BackColor = Color.FromArgb(197, 197, 197)
-        btnWant.BackColor = Color.FromArgb(197, 197, 197)
-        btnMessage.BackColor = Color.FromArgb(197, 197, 197)
-        btnPayment.BackColor = Color.FromArgb(197, 197, 197)
+        btnProfile.BackColor = inactive_color
+        btnChangePackage.BackColor = active_color
+        btnOffer.BackColor = inactive_color
+        btnWant.BackColor = inactive_color
+        btnMessage.BackColor = inactive_color
+        btnPayment.BackColor = inactive_color
 
         tabControl.SelectedIndex = 1
 
     End Sub
 
     Private Sub btnOffer_Click(sender As Object, e As EventArgs) Handles btnOffer.Click
-        btnProfile.BackColor = Color.FromArgb(197, 197, 197)
-        btnChangePackage.BackColor = Color.FromArgb(197, 197, 197)
-        btnOffer.BackColor = Color.FromArgb(219, 219, 219)
-        btnWant.BackColor = Color.FromArgb(197, 197, 197)
-        btnMessage.BackColor = Color.FromArgb(197, 197, 197)
-        btnPayment.BackColor = Color.FromArgb(197, 197, 197)
+        btnProfile.BackColor = inactive_color
+        btnChangePackage.BackColor = inactive_color
+        btnOffer.BackColor = active_color
+        btnWant.BackColor = inactive_color
+        btnMessage.BackColor = inactive_color
+        btnPayment.BackColor = inactive_color
 
         tabControl.SelectedIndex = 2
 
     End Sub
 
     Private Sub btnWant_Click(sender As Object, e As EventArgs) Handles btnWant.Click
-        btnProfile.BackColor = Color.FromArgb(197, 197, 197)
-        btnChangePackage.BackColor = Color.FromArgb(197, 197, 197)
-        btnOffer.BackColor = Color.FromArgb(197, 197, 197)
-        btnWant.BackColor = Color.FromArgb(219, 219, 219)
-        btnMessage.BackColor = Color.FromArgb(197, 197, 197)
-        btnPayment.BackColor = Color.FromArgb(197, 197, 197)
+        btnProfile.BackColor = inactive_color
+        btnChangePackage.BackColor = inactive_color
+        btnOffer.BackColor = inactive_color
+        btnWant.BackColor = active_color
+        btnMessage.BackColor = inactive_color
+        btnPayment.BackColor = inactive_color
 
         tabControl.SelectedIndex = 3
 
     End Sub
 
     Private Sub btnMessage_Click(sender As Object, e As EventArgs) Handles btnMessage.Click
-        btnProfile.BackColor = Color.FromArgb(197, 197, 197)
-        btnChangePackage.BackColor = Color.FromArgb(197, 197, 197)
-        btnOffer.BackColor = Color.FromArgb(197, 197, 197)
-        btnWant.BackColor = Color.FromArgb(197, 197, 197)
-        btnMessage.BackColor = Color.FromArgb(219, 219, 219)
-        btnPayment.BackColor = Color.FromArgb(197, 197, 197)
+        btnProfile.BackColor = inactive_color
+        btnChangePackage.BackColor = inactive_color
+        btnOffer.BackColor = inactive_color
+        btnWant.BackColor = inactive_color
+        btnMessage.BackColor = active_color
+        btnPayment.BackColor = inactive_color
 
         tabControl.SelectedIndex = 4
 
     End Sub
 
     Private Sub btnPayment_Click(sender As Object, e As EventArgs) Handles btnPayment.Click
-        btnProfile.BackColor = Color.FromArgb(197, 197, 197)
-        btnChangePackage.BackColor = Color.FromArgb(197, 197, 197)
-        btnOffer.BackColor = Color.FromArgb(197, 197, 197)
-        btnWant.BackColor = Color.FromArgb(197, 197, 197)
-        btnMessage.BackColor = Color.FromArgb(197, 197, 197)
-        btnPayment.BackColor = Color.FromArgb(219, 219, 219)
+        btnProfile.BackColor = inactive_color
+        btnChangePackage.BackColor = inactive_color
+        btnOffer.BackColor = inactive_color
+        btnWant.BackColor = inactive_color
+        btnMessage.BackColor = inactive_color
+        btnPayment.BackColor = active_color
 
         tabControl.SelectedIndex = 5
 
