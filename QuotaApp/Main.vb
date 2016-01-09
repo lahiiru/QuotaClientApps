@@ -30,8 +30,14 @@ Module Main
         WebRequest.Proxy = Nothing
 
         myLog.Log = "QuotaLog"
+
+        'if Quotalog doesn't exists create
+        If Not EventLog.Exists("QuotaLog") Then
+            EventLog.CreateEventSource("QuotaSvr", "QuotaLog")
+        End If
         AddHandler myLog.EntryWritten, AddressOf mainForm.processLog
         myLog.EnableRaisingEvents = True
+
         'On Error GoTo e109
 
         mainForm.ServiceController1.ServiceName = serviceName

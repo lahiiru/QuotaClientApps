@@ -32,20 +32,17 @@ Public Class QuotaService
         My.Settings.sKey = args(2)
         My.Settings.Save()
 
-
-
         'create custom log called Quatalog
         myLog.Log = "QuotaLog"
         myLog.Source = "QuotaSvr"
-        Log("starting")
 
-        Log("pKey : " & My.Settings.pKey)
-        Log("sKey " & My.Settings.sKey)
         Try
             EventLog.CreateEventSource("QuotaSvr", "QuotaLog")
         Catch ex As Exception
         End Try
-        'disconectProcess()
+
+        Log("starting")
+
         timer.Interval = 1000 ' 60 seconds
         AddHandler timer.Elapsed, AddressOf Me.OnTimer
         wc.Proxy = Nothing

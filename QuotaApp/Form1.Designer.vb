@@ -31,44 +31,44 @@ Partial Class Form1
         Me.ToolStripStatusLabel3 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabel2 = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.ServiceController1 = New System.ServiceProcess.ServiceController()
         Me.cmbSSID = New System.Windows.Forms.ComboBox()
         Me.tabControl = New System.Windows.Forms.TabControl()
         Me.tabProfile = New System.Windows.Forms.TabPage()
-        Me.Button6 = New System.Windows.Forms.Button()
-        Me.Button5 = New System.Windows.Forms.Button()
-        Me.Button4 = New System.Windows.Forms.Button()
-        Me.Button3 = New System.Windows.Forms.Button()
-        Me.TextBox1 = New System.Windows.Forms.TextBox()
-        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         Me.Label6 = New System.Windows.Forms.Label()
+        Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Label11 = New System.Windows.Forms.Label()
+        Me.Button6 = New System.Windows.Forms.Button()
         Me.Label9 = New System.Windows.Forms.Label()
+        Me.Button5 = New System.Windows.Forms.Button()
         Me.Label10 = New System.Windows.Forms.Label()
+        Me.Button4 = New System.Windows.Forms.Button()
         Me.Label8 = New System.Windows.Forms.Label()
+        Me.Button3 = New System.Windows.Forms.Button()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Label16 = New System.Windows.Forms.Label()
         Me.tabChnageMyPackage = New System.Windows.Forms.TabPage()
+        Me.tabOffer = New System.Windows.Forms.TabPage()
+        Me.tabWant = New System.Windows.Forms.TabPage()
+        Me.tabMessage = New System.Windows.Forms.TabPage()
+        Me.tabPayments = New System.Windows.Forms.TabPage()
+        Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         Me.btnProfile = New System.Windows.Forms.Button()
         Me.btnChangePackage = New System.Windows.Forms.Button()
         Me.btnOffer = New System.Windows.Forms.Button()
         Me.btnWant = New System.Windows.Forms.Button()
         Me.btnMessage = New System.Windows.Forms.Button()
         Me.btnPayment = New System.Windows.Forms.Button()
-        Me.tabOffer = New System.Windows.Forms.TabPage()
-        Me.tabWant = New System.Windows.Forms.TabPage()
-        Me.tabMessage = New System.Windows.Forms.TabPage()
-        Me.tabPayments = New System.Windows.Forms.TabPage()
+        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         CType(Me.EventLog1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.tabControl.SuspendLayout()
         Me.tabProfile.SuspendLayout()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'EventLog1
@@ -97,9 +97,9 @@ Partial Class Form1
         '
         Me.StatusStrip1.BackColor = System.Drawing.SystemColors.ButtonFace
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel3, Me.ToolStripStatusLabel1, Me.ToolStripStatusLabel2})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 492)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 468)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(620, 22)
+        Me.StatusStrip1.Size = New System.Drawing.Size(616, 22)
         Me.StatusStrip1.TabIndex = 15
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -120,15 +120,6 @@ Partial Class Form1
         Me.ToolStripStatusLabel2.Name = "ToolStripStatusLabel2"
         Me.ToolStripStatusLabel2.Size = New System.Drawing.Size(45, 17)
         Me.ToolStripStatusLabel2.Text = "^ 0 Mb"
-        '
-        'PictureBox1
-        '
-        Me.PictureBox1.Image = Global.Quota.My.Resources.Resources._default
-        Me.PictureBox1.Location = New System.Drawing.Point(-1, -2)
-        Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(618, 161)
-        Me.PictureBox1.TabIndex = 17
-        Me.PictureBox1.TabStop = False
         '
         'Label1
         '
@@ -159,7 +150,7 @@ Partial Class Form1
         Me.tabControl.Controls.Add(Me.tabWant)
         Me.tabControl.Controls.Add(Me.tabMessage)
         Me.tabControl.Controls.Add(Me.tabPayments)
-        Me.tabControl.Location = New System.Drawing.Point(103, 164)
+        Me.tabControl.Location = New System.Drawing.Point(103, 157)
         Me.tabControl.Name = "tabControl"
         Me.tabControl.SelectedIndex = 0
         Me.tabControl.Size = New System.Drawing.Size(514, 298)
@@ -190,41 +181,13 @@ Partial Class Form1
         Me.tabProfile.TabIndex = 0
         Me.tabProfile.Text = "TabPage1"
         '
-        'Button6
+        'Label6
         '
-        Me.Button6.Location = New System.Drawing.Point(387, 238)
-        Me.Button6.Name = "Button6"
-        Me.Button6.Size = New System.Drawing.Size(75, 23)
-        Me.Button6.TabIndex = 34
-        Me.Button6.Text = "CHANGE"
-        Me.Button6.UseVisualStyleBackColor = True
-        '
-        'Button5
-        '
-        Me.Button5.Location = New System.Drawing.Point(310, 236)
-        Me.Button5.Name = "Button5"
-        Me.Button5.Size = New System.Drawing.Size(75, 23)
-        Me.Button5.TabIndex = 33
-        Me.Button5.Text = "CLEAR"
-        Me.Button5.UseVisualStyleBackColor = True
-        '
-        'Button4
-        '
-        Me.Button4.Location = New System.Drawing.Point(229, 236)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(75, 23)
-        Me.Button4.TabIndex = 32
-        Me.Button4.Text = "Button4"
-        Me.Button4.UseVisualStyleBackColor = True
-        '
-        'Button3
-        '
-        Me.Button3.Location = New System.Drawing.Point(138, 236)
-        Me.Button3.Name = "Button3"
-        Me.Button3.Size = New System.Drawing.Size(85, 23)
-        Me.Button3.TabIndex = 30
-        Me.Button3.Text = "Update"
-        Me.Button3.UseVisualStyleBackColor = True
+        Me.Label6.Location = New System.Drawing.Point(44, 34)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(66, 23)
+        Me.Label6.TabIndex = 10
+        Me.Label6.Text = "Remaining"
         '
         'TextBox1
         '
@@ -239,24 +202,6 @@ Partial Class Form1
         Me.TextBox1.TabIndex = 0
         Me.TextBox1.Text = "No announcements"
         '
-        'LinkLabel1
-        '
-        Me.LinkLabel1.AutoSize = True
-        Me.LinkLabel1.Location = New System.Drawing.Point(448, 468)
-        Me.LinkLabel1.Name = "LinkLabel1"
-        Me.LinkLabel1.Size = New System.Drawing.Size(165, 13)
-        Me.LinkLabel1.TabIndex = 27
-        Me.LinkLabel1.TabStop = True
-        Me.LinkLabel1.Text = "http://edu.wearetrying.info/quota"
-        '
-        'Label6
-        '
-        Me.Label6.Location = New System.Drawing.Point(44, 34)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(66, 23)
-        Me.Label6.TabIndex = 10
-        Me.Label6.Text = "Remaining"
-        '
         'Label11
         '
         Me.Label11.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -266,12 +211,30 @@ Partial Class Form1
         Me.Label11.TabIndex = 11
         Me.Label11.Text = "No"
         '
+        'Button6
+        '
+        Me.Button6.Location = New System.Drawing.Point(387, 238)
+        Me.Button6.Name = "Button6"
+        Me.Button6.Size = New System.Drawing.Size(75, 23)
+        Me.Button6.TabIndex = 34
+        Me.Button6.Text = "CHANGE"
+        Me.Button6.UseVisualStyleBackColor = True
+        '
         'Label9
         '
         Me.Label9.Location = New System.Drawing.Point(116, 80)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(87, 23)
         Me.Label9.TabIndex = 12
+        '
+        'Button5
+        '
+        Me.Button5.Location = New System.Drawing.Point(310, 236)
+        Me.Button5.Name = "Button5"
+        Me.Button5.Size = New System.Drawing.Size(75, 23)
+        Me.Button5.TabIndex = 33
+        Me.Button5.Text = "CLEAR"
+        Me.Button5.UseVisualStyleBackColor = True
         '
         'Label10
         '
@@ -281,6 +244,15 @@ Partial Class Form1
         Me.Label10.TabIndex = 13
         Me.Label10.Text = "Blacklisted"
         '
+        'Button4
+        '
+        Me.Button4.Location = New System.Drawing.Point(229, 236)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(75, 23)
+        Me.Button4.TabIndex = 32
+        Me.Button4.Text = "Button4"
+        Me.Button4.UseVisualStyleBackColor = True
+        '
         'Label8
         '
         Me.Label8.Location = New System.Drawing.Point(44, 80)
@@ -288,6 +260,15 @@ Partial Class Form1
         Me.Label8.Size = New System.Drawing.Size(66, 23)
         Me.Label8.TabIndex = 14
         Me.Label8.Text = "Expired on"
+        '
+        'Button3
+        '
+        Me.Button3.Location = New System.Drawing.Point(138, 236)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(85, 23)
+        Me.Button3.TabIndex = 30
+        Me.Button3.Text = "Update"
+        Me.Button3.UseVisualStyleBackColor = True
         '
         'Label5
         '
@@ -341,90 +322,6 @@ Partial Class Form1
         Me.tabChnageMyPackage.TabIndex = 1
         Me.tabChnageMyPackage.Text = "TabPage2"
         '
-        'btnProfile
-        '
-        Me.btnProfile.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
-        Me.btnProfile.FlatAppearance.BorderSize = 0
-        Me.btnProfile.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnProfile.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnProfile.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnProfile.Location = New System.Drawing.Point(6, 189)
-        Me.btnProfile.Name = "btnProfile"
-        Me.btnProfile.Size = New System.Drawing.Size(102, 45)
-        Me.btnProfile.TabIndex = 24
-        Me.btnProfile.Text = "Profile"
-        Me.btnProfile.UseVisualStyleBackColor = False
-        '
-        'btnChangePackage
-        '
-        Me.btnChangePackage.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
-        Me.btnChangePackage.FlatAppearance.BorderSize = 0
-        Me.btnChangePackage.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnChangePackage.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnChangePackage.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnChangePackage.Location = New System.Drawing.Point(6, 234)
-        Me.btnChangePackage.Name = "btnChangePackage"
-        Me.btnChangePackage.Size = New System.Drawing.Size(102, 45)
-        Me.btnChangePackage.TabIndex = 25
-        Me.btnChangePackage.Text = "Change my package"
-        Me.btnChangePackage.UseVisualStyleBackColor = False
-        '
-        'btnOffer
-        '
-        Me.btnOffer.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
-        Me.btnOffer.FlatAppearance.BorderSize = 0
-        Me.btnOffer.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnOffer.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnOffer.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnOffer.Location = New System.Drawing.Point(6, 279)
-        Me.btnOffer.Name = "btnOffer"
-        Me.btnOffer.Size = New System.Drawing.Size(102, 45)
-        Me.btnOffer.TabIndex = 26
-        Me.btnOffer.Text = "Offer data"
-        Me.btnOffer.UseVisualStyleBackColor = False
-        '
-        'btnWant
-        '
-        Me.btnWant.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
-        Me.btnWant.FlatAppearance.BorderSize = 0
-        Me.btnWant.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnWant.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnWant.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnWant.Location = New System.Drawing.Point(6, 324)
-        Me.btnWant.Name = "btnWant"
-        Me.btnWant.Size = New System.Drawing.Size(102, 45)
-        Me.btnWant.TabIndex = 27
-        Me.btnWant.Text = "Request data"
-        Me.btnWant.UseVisualStyleBackColor = False
-        '
-        'btnMessage
-        '
-        Me.btnMessage.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
-        Me.btnMessage.FlatAppearance.BorderSize = 0
-        Me.btnMessage.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnMessage.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnMessage.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnMessage.Location = New System.Drawing.Point(6, 369)
-        Me.btnMessage.Name = "btnMessage"
-        Me.btnMessage.Size = New System.Drawing.Size(102, 45)
-        Me.btnMessage.TabIndex = 28
-        Me.btnMessage.Text = "Send message"
-        Me.btnMessage.UseVisualStyleBackColor = False
-        '
-        'btnPayment
-        '
-        Me.btnPayment.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
-        Me.btnPayment.FlatAppearance.BorderSize = 0
-        Me.btnPayment.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnPayment.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.btnPayment.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnPayment.Location = New System.Drawing.Point(6, 414)
-        Me.btnPayment.Name = "btnPayment"
-        Me.btnPayment.Size = New System.Drawing.Size(102, 45)
-        Me.btnPayment.TabIndex = 29
-        Me.btnPayment.Text = "My payments"
-        Me.btnPayment.UseVisualStyleBackColor = False
-        '
         'tabOffer
         '
         Me.tabOffer.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
@@ -465,12 +362,115 @@ Partial Class Form1
         Me.tabPayments.TabIndex = 5
         Me.tabPayments.Text = "TabPage6"
         '
+        'LinkLabel1
+        '
+        Me.LinkLabel1.AutoSize = True
+        Me.LinkLabel1.Location = New System.Drawing.Point(433, 455)
+        Me.LinkLabel1.Name = "LinkLabel1"
+        Me.LinkLabel1.Size = New System.Drawing.Size(165, 13)
+        Me.LinkLabel1.TabIndex = 27
+        Me.LinkLabel1.TabStop = True
+        Me.LinkLabel1.Text = "http://edu.wearetrying.info/quota"
+        '
+        'btnProfile
+        '
+        Me.btnProfile.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
+        Me.btnProfile.FlatAppearance.BorderSize = 0
+        Me.btnProfile.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnProfile.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnProfile.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnProfile.Location = New System.Drawing.Point(4, 175)
+        Me.btnProfile.Name = "btnProfile"
+        Me.btnProfile.Size = New System.Drawing.Size(102, 45)
+        Me.btnProfile.TabIndex = 24
+        Me.btnProfile.Text = "Profile"
+        Me.btnProfile.UseVisualStyleBackColor = False
+        '
+        'btnChangePackage
+        '
+        Me.btnChangePackage.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
+        Me.btnChangePackage.FlatAppearance.BorderSize = 0
+        Me.btnChangePackage.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnChangePackage.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnChangePackage.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnChangePackage.Location = New System.Drawing.Point(4, 220)
+        Me.btnChangePackage.Name = "btnChangePackage"
+        Me.btnChangePackage.Size = New System.Drawing.Size(102, 45)
+        Me.btnChangePackage.TabIndex = 25
+        Me.btnChangePackage.Text = "Change my package"
+        Me.btnChangePackage.UseVisualStyleBackColor = False
+        '
+        'btnOffer
+        '
+        Me.btnOffer.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
+        Me.btnOffer.FlatAppearance.BorderSize = 0
+        Me.btnOffer.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnOffer.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnOffer.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnOffer.Location = New System.Drawing.Point(4, 265)
+        Me.btnOffer.Name = "btnOffer"
+        Me.btnOffer.Size = New System.Drawing.Size(102, 45)
+        Me.btnOffer.TabIndex = 26
+        Me.btnOffer.Text = "Offer data"
+        Me.btnOffer.UseVisualStyleBackColor = False
+        '
+        'btnWant
+        '
+        Me.btnWant.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
+        Me.btnWant.FlatAppearance.BorderSize = 0
+        Me.btnWant.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnWant.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnWant.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnWant.Location = New System.Drawing.Point(4, 310)
+        Me.btnWant.Name = "btnWant"
+        Me.btnWant.Size = New System.Drawing.Size(102, 45)
+        Me.btnWant.TabIndex = 27
+        Me.btnWant.Text = "Request data"
+        Me.btnWant.UseVisualStyleBackColor = False
+        '
+        'btnMessage
+        '
+        Me.btnMessage.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
+        Me.btnMessage.FlatAppearance.BorderSize = 0
+        Me.btnMessage.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnMessage.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnMessage.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnMessage.Location = New System.Drawing.Point(4, 355)
+        Me.btnMessage.Name = "btnMessage"
+        Me.btnMessage.Size = New System.Drawing.Size(102, 45)
+        Me.btnMessage.TabIndex = 28
+        Me.btnMessage.Text = "Send message"
+        Me.btnMessage.UseVisualStyleBackColor = False
+        '
+        'btnPayment
+        '
+        Me.btnPayment.BackColor = System.Drawing.Color.FromArgb(CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer), CType(CType(197, Byte), Integer))
+        Me.btnPayment.FlatAppearance.BorderSize = 0
+        Me.btnPayment.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnPayment.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.btnPayment.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnPayment.Location = New System.Drawing.Point(4, 400)
+        Me.btnPayment.Name = "btnPayment"
+        Me.btnPayment.Size = New System.Drawing.Size(102, 45)
+        Me.btnPayment.TabIndex = 29
+        Me.btnPayment.Text = "My payments"
+        Me.btnPayment.UseVisualStyleBackColor = False
+        '
+        'PictureBox1
+        '
+        Me.PictureBox1.Image = Global.Quota.My.Resources.Resources._default
+        Me.PictureBox1.Location = New System.Drawing.Point(-1, -2)
+        Me.PictureBox1.Name = "PictureBox1"
+        Me.PictureBox1.Size = New System.Drawing.Size(618, 161)
+        Me.PictureBox1.TabIndex = 17
+        Me.PictureBox1.TabStop = False
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.SystemColors.ButtonFace
-        Me.ClientSize = New System.Drawing.Size(620, 514)
+        Me.ClientSize = New System.Drawing.Size(616, 490)
         Me.Controls.Add(Me.btnPayment)
         Me.Controls.Add(Me.btnProfile)
         Me.Controls.Add(Me.btnMessage)
@@ -491,10 +491,10 @@ Partial Class Form1
         CType(Me.EventLog1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.tabControl.ResumeLayout(False)
         Me.tabProfile.ResumeLayout(False)
         Me.tabProfile.PerformLayout()
+        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
