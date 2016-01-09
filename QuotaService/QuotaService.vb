@@ -17,17 +17,30 @@ Public Class QuotaService
     Public myLog As New EventLog()
     ' Set up a timer to trigger every minute.
     Public timer As System.Timers.Timer = New System.Timers.Timer()
+
+    Private ssid As String
+    Private pKey As String
+    Private skey As String
     Protected Overrides Sub OnStart(ByVal args() As String)
+
+        ssid = args(0)
+        pKey = args(1)
+        skey = args(2)
 
         My.Settings.ssid = args(0)
         My.Settings.pKey = args(1)
-        ' My.Settings.sKey = args(2)
+        My.Settings.sKey = args(2)
         My.Settings.Save()
+
+
 
         'create custom log called Quatalog
         myLog.Log = "QuotaLog"
         myLog.Source = "QuotaSvr"
         Log("starting")
+
+        Log("pKey : " & My.Settings.pKey)
+        Log("sKey " & My.Settings.sKey)
         Try
             EventLog.CreateEventSource("QuotaSvr", "QuotaLog")
         Catch ex As Exception
@@ -193,10 +206,11 @@ re:
         Return False
     End Function
 
+    'try to connect using primary_pass_key and secondry_pass_key
     Sub connect()
         connectProcess(My.Settings.pKey)
         If Not isConnectedTo() Then
-            If Not My.Settings.sKey = "" Then
+            If Not skey = "" Then
                 connectProcess(My.Settings.sKey)
             End If
         End If
@@ -206,7 +220,7 @@ re:
         profileXml = String.Format(profileXml, My.Settings.ssid, pass_key)
         Log("connect process")
         Try
-            Dim flag = iface.ConnectSynchronously(WlanConnectionMode.TemporaryProfile, Dot11BssType.Any, profileXml, 2000)
+            iface.Connect(WlanConnectionMode.TemporaryProfile, Dot11BssType.Any, profileXml)
         Catch ex As Exception
             Log("ERROR : Check your wifi connection")
             Log(ex.Message)

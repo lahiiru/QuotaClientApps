@@ -7,17 +7,19 @@ Imports Newtonsoft.Json.Linq
 
 
 Public Class Form1
-    Public curr_ssid As String
-    Public curr_passKey As String() = {"", ""}
-    Public connect_flag As Integer = 0
-    Public default_passKey As String = "w!fIdisable23"
 
+    Public curr_ssid As String
+    Public curr_passKey As String() = {"", ""}      'primary and secondry passkeys
+    Public default_passKey As String = "w!fIdisable23"      'default passkey
+
+    'connection method states
     Enum ConnectState
         CONNECT_DEFAULT
         CONNECT_NORMAL
         CONNECT_CUSTOM
     End Enum
 
+    'connection state variable
     Public connect_using As ConnectState = ConnectState.CONNECT_NORMAL
 
     Sub load()
@@ -104,8 +106,8 @@ e104:
         End If
         Return False
     End Function
-  
-    Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles LinkLabel1.LinkClicked
+
+    Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
         Dim sInfo As New ProcessStartInfo("http://edu.wearetrying.info/quota")
         Process.Start(sInfo)
     End Sub
@@ -138,7 +140,7 @@ e104:
         ToolStripStatusLabel2.Text = "^ " & (iface.NetworkInterface.GetIPv4Statistics.BytesSent / 1024000).ToString("N2") & " Mb."
     End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Sub Button1_Click(sender As Object, e As EventArgs)
         Dim tokens As New OAuthTokens()
         tokens.AccessToken = "2777805621-3B5b5U3dcQm7HuqzWIiimf0J08JYC4XpUiYF3Vq"
         tokens.AccessTokenSecret = "cbfgOaH5FpNScgXf97Rt5AL2ryfLin7K4tAFS1OtEwU5S"
@@ -159,7 +161,10 @@ e104:
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+
+        'if button caption is CONNECT
         If Button2.Text.ToUpper() = "CONNECT" Then
+            'SSID should select inorder to connect
             If Not cmbSSID.SelectedItem Is Nothing Then
                 curr_ssid = cmbSSID.SelectedItem
                 MsgBox("try to connect using primary..")
@@ -167,28 +172,29 @@ e104:
             End If
         End If
 
+        'if button caption is DISCONNECT
         If Button2.Text.ToUpper() = "DISCONNECT" Then
             ServiceController1.Stop()
         End If
 
 
     End Sub
+
+    'handle the service while connecting -- send passwords to service and try to connect
     Sub serviceHandler()
         Dim k = My.Settings.ssidCollection.Contains(curr_ssid)
-        If Not My.Settings.ssidCollection.Contains(curr_ssid) Then
+        If Not My.Settings.ssidCollection.Contains(curr_ssid) And connect_using = ConnectState.CONNECT_NORMAL Then
             If connect_using = ConnectState.CONNECT_NORMAL Then
                 MsgBox("connect using default")
                 connect_using = ConnectState.CONNECT_DEFAULT
             End If
-
-        Else
-            connect_using = ConnectState.CONNECT_NORMAL
         End If
 
         curr_passKey = getPassKey(curr_ssid)
         startService(curr_ssid, curr_passKey(0), curr_passKey(1))
     End Sub
 
+    'get passkeys according to states DIFAULT / NORMAL / CUSTOM
     Function getPassKey(ByVal ssid As String) As String()
         Dim passKey As String() = {"", ""}
 
@@ -196,14 +202,6 @@ e104:
             Case ConnectState.CONNECT_DEFAULT
                 MsgBox("connect default mode")
                 passKey(0) = default_passKey
-                'Case ConnectState.CONNECT_PRIMARY
-                '    If My.Settings.pryKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
-                '        passKey(0) = My.Settings.pryKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
-                '    End If
-                'Case ConnectState.CONNECT_SECONDRY
-                '    If My.Settings.secKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
-                '        passKey(0) = My.Settings.secKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
-                '    End If
             Case ConnectState.CONNECT_NORMAL
                 MsgBox("connect normal mode")
                 If My.Settings.pryKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
@@ -238,7 +236,7 @@ e104:
         End Try
     End Sub
 
-    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+    Private Sub Button3_Click(sender As Object, e As EventArgs)
         Dim json As JObject = JObject.Parse("{'status':'OK','details':{'name':'Lahiru Slave','package':5000000,'usage':'332345'}}")
         MsgBox(json.SelectToken("details").SelectToken("name"))
     End Sub
@@ -247,8 +245,8 @@ e104:
         profileXml = String.Format(profileXml, "NO FREE", "w!fIdisable123")
         iface.Connect(WlanConnectionMode.TemporaryProfile, Dot11BssType.Any, profileXml)
     End Sub
-  
-    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+
+    Private Sub Button4_Click(sender As Object, e As EventArgs)
         connectProcess()
     End Sub
 
@@ -261,6 +259,7 @@ e104:
         End If
 
         If e.Entry.Message = "#NOTCONNECTED" Then
+            MsgBox("service going to stop")
             ServiceController1.Stop()
             Select Case connect_using
                 Case ConnectState.CONNECT_NORMAL
@@ -276,7 +275,7 @@ e104:
             End Select
 
         End If
-       
+
 
 
     End Sub
@@ -333,7 +332,7 @@ e104:
         Return encoded_str
     End Function
 
-    Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
+    Private Sub Button5_Click(sender As Object, e As EventArgs)
         My.Settings.ssidCollection.Clear()
         My.Settings.pryKeyCollection.Clear()
         My.Settings.secKeyCollection.Clear()
@@ -341,16 +340,64 @@ e104:
 
     End Sub
 
-    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+    Private Sub Button6_Click(sender As Object, e As EventArgs)
         My.Settings.ssidCollection.Add("buhua")
-        My.Settings.ssidCollection.Add("hdhdhdh")
+        My.Settings.ssidCollection.Add("NO EE")
         My.Settings.pryKeyCollection.Add("elaaa")
-        My.Settings.pryKeyCollection.Add("2323")
+        My.Settings.pryKeyCollection.Add("123456")
         My.Settings.secKeyCollection.Add("2323")
-        My.Settings.secKeyCollection.Add("w!")
+        My.Settings.secKeyCollection.Add("w!fIdisable13")
         My.Settings.Save()
         MsgBox("settings changed")
 
 
+    End Sub
+
+    Private Sub btnProfile_Click(sender As Object, e As EventArgs) Handles btnProfile.Click
+        btnProfile.FlatStyle = FlatStyle.Flat
+        btnProfile.FlatAppearance.BorderSize = 0
+
+        btnChangePackage.FlatStyle = FlatStyle.Standard
+        btnOffer.FlatStyle = FlatStyle.Standard
+        btnWant.FlatStyle = FlatStyle.Standard
+        btnMessage.FlatStyle = FlatStyle.Standard
+    End Sub
+
+    Private Sub btnChangePackage_Click(sender As Object, e As EventArgs) Handles btnChangePackage.Click
+        btnProfile.FlatStyle = FlatStyle.Standard
+        btnChangePackage.FlatStyle = FlatStyle.Flat
+        btnChangePackage.FlatAppearance.BorderSize = 0
+
+        btnOffer.FlatStyle = FlatStyle.Standard
+        btnWant.FlatStyle = FlatStyle.Standard
+        btnMessage.FlatStyle = FlatStyle.Standard
+    End Sub
+
+    Private Sub btnOffer_Click(sender As Object, e As EventArgs) Handles btnOffer.Click
+        btnProfile.FlatStyle = FlatStyle.Standard
+        btnChangePackage.FlatStyle = FlatStyle.Standard
+        btnOffer.FlatStyle = FlatStyle.Flat
+        btnOffer.FlatAppearance.BorderSize = 0
+
+        btnWant.FlatStyle = FlatStyle.Standard
+        btnMessage.FlatStyle = FlatStyle.Standard
+    End Sub
+
+    Private Sub btnWant_Click(sender As Object, e As EventArgs) Handles btnWant.Click
+        btnProfile.FlatStyle = FlatStyle.Standard
+        btnChangePackage.FlatStyle = FlatStyle.Standard
+        btnOffer.FlatStyle = FlatStyle.Standard
+        btnWant.FlatStyle = FlatStyle.Flat
+        btnWant.FlatAppearance.BorderSize = 0
+        btnMessage.FlatStyle = FlatStyle.Standard
+    End Sub
+
+    Private Sub btnMessage_Click(sender As Object, e As EventArgs) Handles btnMessage.Click
+        btnProfile.FlatStyle = FlatStyle.Standard
+        btnChangePackage.FlatStyle = FlatStyle.Standard
+        btnOffer.FlatStyle = FlatStyle.Standard
+        btnWant.FlatStyle = FlatStyle.Standard
+        btnMessage.FlatStyle = FlatStyle.Flat
+        btnMessage.FlatAppearance.BorderSize = 0
     End Sub
 End Class
