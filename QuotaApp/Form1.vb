@@ -182,11 +182,21 @@ Public Class Form1
                 MsgBox("Oops! """ & serviceName & """ service is not intalled." & vbNewLine & "Please re-install Quota", MsgBoxStyle.Exclamation, "Service not found")
             End Try
 
+
             If Not ServiceController1.Status = ServiceControllerStatus.Running Then
-                ServiceController1.Start({ssid, pKey, sKey})
+
+                ' if service is still in stopping process stay here untill stop
+                While (ServiceController1.Status = ServiceControllerStatus.StopPending)
+                End While
+
+                'if the service is stopped then only try to start the service
+                If (ServiceController1.Status = ServiceControllerStatus.Stopped) Then
+                    ServiceController1.Start({ssid, pKey, sKey})
+                End If
             Else
                 ServiceController1.Stop()
             End If
+
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Exclamation, "Service error")
         End Try
