@@ -18,18 +18,22 @@ Public Class QuotaService
     ' Set up a timer to trigger every minute.
     Public timer As System.Timers.Timer = New System.Timers.Timer()
     Private irregularStop As Boolean = False 'whether the stop is not healthy or not
-    Private ssid As String
-    Private pKey As String
-    Private skey As String
+    Private ssid As String = ""
+    Private customKey As String = ""
+    Private keyIndex As Integer = 0
     Protected Overrides Sub OnStart(ByVal args() As String)
 
-        ssid = args(0)
-        pKey = args(1)
-        skey = args(2)
+        If My.Settings.pryKeyCollection Is Nothing Then
+            My.Settings.pryKeyCollection = New Specialized.StringCollection
+        End If
+        If My.Settings.secKeyCollection Is Nothing Then
+            My.Settings.secKeyCollection = New Specialized.StringCollection
+        End If
 
-        My.Settings.ssid = args(0)
-        My.Settings.pKey = args(1)
-        My.Settings.sKey = args(2)
+        ssid = args(0)
+        keyIndex = args(1)
+        customKey = args(2)
+
         My.Settings.Save()
 
         'create custom log called Quatalog
@@ -48,7 +52,7 @@ Public Class QuotaService
         wc.Proxy = Nothing
         iface = client.Interfaces(0)
         mac = iface.NetworkInterface.GetPhysicalAddress().ToString()
-        requestHandler = requestHandler & My.Settings.ssid & "/" & mac & "/"
+        requestHandler = requestHandler & ssid & "/" & mac & "/"
         ' Add code here to start your service. This method should set things
         ' in motion so your service can do its work.
         Dim retries As Integer = 3
@@ -57,6 +61,7 @@ retry:
         Thread.Sleep(3000 / retries)
         If isConnectedTo() Then
             Log("#CONNECTED")
+            irregularStop = False
             usercheck()
         ElseIf retries > 1 Then
             retries = retries - 1
@@ -70,7 +75,7 @@ retry:
 
         'retriveAndSetSettings()
         'check()
-        'timer.Start()
+        timer.Start()
 
     End Sub
     Private Sub OnTimer(sender As Object, e As Timers.ElapsedEventArgs)
@@ -90,22 +95,28 @@ retry:
     Function usercheck() As Boolean
         On Error GoTo err
         Dim url As String = requestHandler & "check"
+        Log("Posting to: " & url)
         Dim response As String = wc.DownloadString(url)
+        Log("Response: " & response)
         Dim json As JObject = JObject.Parse(response)
-        If (json.SelectToken("status") = "OK") Then
-            Log("#MSG:Connection successful")
+        If (json.SelectToken("status") = "NEW") Then
+            LogMsg("Welcome new user!")
+            Log("#UPDATE:" & response)
+            Return True
+        ElseIf (json.SelectToken("status") = "OK") Then
+            LogMsg("User OK.") 'for debugging perpose
             Log("#UPDATE:" & response)
             Return True
         ElseIf (json.SelectToken("status") = "BLOCKED") Then
-            Log("#MSG:You are blacklisted")
+            LogMsg("You are blacklisted!", MsgBoxStyle.Exclamation)
             Log("#UPDATE:" & response)
             Me.Stop()
         ElseIf (json.SelectToken("status") = "OVER") Then
-            Log("#MSG:Your remaining quota is less than 1Mb")
+            LogMsg("Reserved quota for you is too low", MsgBoxStyle.Exclamation)
             Log("#UPDATE:" & response)
             Me.Stop()
         ElseIf (json.SelectToken("status") = "ERROR") Then
-            Log("#MSG:Internal server error occured")
+            LogMsg("Internal server error occured.", MsgBoxStyle.Exclamation)
             Me.Stop()
         End If
         Return False
@@ -114,7 +125,9 @@ err:
         disconnect()
 
     End Function
-
+    Sub LogMsg(ByVal body As String, Optional ByVal type As MsgBoxStyle = MsgBoxStyle.Information, Optional ByVal title As String = "Quota service says")
+        Log(String.Format("#MSG:{0}:{1}:{2}", body, Integer.Parse(type), title))
+    End Sub
     Sub prepareUsage()
         If Not isConnectedTo() Then
             My.Settings.usage = 0
@@ -170,50 +183,69 @@ re:
         End If
         Return response.Split(";")
     End Function
-
     Function uploadUsage(ByVal kbytes As Integer) As Boolean
-        Dim url As String = requestHandler & "usage/" & kbytes.ToString()
-        Dim response As String = wc.DownloadString(url)
-        Dim json As JObject = JObject.Parse(response)
-        If json.SelectToken("status") = "OK" Then
-            Return True
-        Else
+        Try
+            Dim url As String = requestHandler & "usage/" & kbytes.ToString()
+            Log("Posting to: " & url)
+            Dim response As String = wc.DownloadString(url)
+            Log("Response: " & response)
+            Dim json As JObject = JObject.Parse(response)
+            If json.SelectToken("status") = "OK" Then
+                Return True
+            Else
+                Return False
+            End If
+        Catch ex As Exception
             Return False
-        End If
+        End Try
     End Function
-
-
     Function isConnectedTo()
         If Not iface.InterfaceState = WlanInterfaceState.Connected Then
             Return False
         End If
-        If iface.CurrentConnection.profileName.ToUpper.Contains(My.Settings.ssid.ToUpper()) Then
+        If iface.CurrentConnection.profileName.ToUpper.Contains(ssid.ToUpper()) Then
             Return True
         End If
         Return False
     End Function
-
-    'try to connect using primary_pass_key and secondry_pass_key
     Sub connect()
-        connectProcess(My.Settings.pKey)
+        'if custom key is defined
+        If Not customKey.Equals("") Then
+            connectProcess(customKey)
+            Exit Sub
+        End If
+
+        'if custom key is not definded and
+        'first try, connect using pkey
+        If My.Settings.pryKeyCollection.Count() > keyIndex Then
+            Dim pKey = My.Settings.pryKeyCollection(keyIndex)
+            If Not pKey.Equals("") Then
+                connectProcess(pKey)
+            End If
+        End If
+
+        'if custom key is not definded and
+        'skey fails to connect, connect using skey
         If Not isConnectedTo() Then
-            If Not skey = "" Then
-                connectProcess(My.Settings.sKey)
+            If My.Settings.secKeyCollection.Count() > keyIndex Then
+                Dim skey = My.Settings.secKeyCollection(keyIndex)
+                Log("pKey was incorrect. Trying sKey")
+                If Not skey.Equals("") Then
+                    connectProcess(skey)
+                End If
             End If
         End If
     End Sub
     Sub connectProcess(ByVal pass_key As String)
         Dim profileXml As String = "<?xml version=""1.0""?><WLANProfile xmlns=""http://www.microsoft.com/networking/WLAN/profile/v1""><name>{0}</name><SSIDConfig><SSID><name>{0}</name></SSID></SSIDConfig><connectionType>ESS</connectionType><connectionMode>manual</connectionMode><MSM><security><authEncryption><authentication>WPA2PSK</authentication><encryption>AES</encryption><useOneX>false</useOneX></authEncryption><sharedKey><keyType>passPhrase</keyType><protected>false</protected><keyMaterial>{1}</keyMaterial></sharedKey></security></MSM><MacRandomization xmlns=""http://www.microsoft.com/networking/WLAN/profile/v3""><enableRandomization>false</enableRandomization></MacRandomization></WLANProfile>"
-        profileXml = String.Format(profileXml, My.Settings.ssid, pass_key)
-        Log("connect process")
+        profileXml = String.Format(profileXml, ssid, pass_key)
+        Log("connect process with " & ssid & " <=> " & pass_key)
         Try
             iface.Connect(WlanConnectionMode.TemporaryProfile, Dot11BssType.Any, profileXml)
         Catch ex As Exception
             Log("ERROR : Check your wifi connection")
             Log(ex.Message)
         End Try
-
-
     End Sub
     Function getRandom(ByVal min As Integer, ByVal max As Integer)
         Dim gen As System.Random = New System.Random()
@@ -232,15 +264,21 @@ re:
         iface.Disconnect()
     End Sub
     Protected Overrides Sub OnStop()
-        Log("Stopping")
-        prepareUsage()
-        preparePending()
-        If Not irregularStop Then
-            Log("auto stop")
-            uploadData()
-        End If
-        disconnect()
+        Try
+            Log("Stopping")
+            prepareUsage()
+            preparePending()
+            If Not irregularStop Then
+                Log("auto stop")
+                uploadData()
+            End If
+
+            My.Settings.Save()
+        Catch ex As Exception
+
+        End Try
         My.Settings.Save()
+        disconnect()
         ' Add code here to perform any tear-down necessary to stop your service.
     End Sub
     Protected Overrides Sub OnCustomCommand(command As Integer)

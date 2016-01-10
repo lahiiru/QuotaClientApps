@@ -9,10 +9,11 @@ Imports Newtonsoft.Json.Linq
 Public Class Form1
 
     Public curr_ssid As String
-    Public curr_passKey As String() = {"", ""}      'primary and secondry passkeys
     Public default_passKey As String = "w!fIdisable23"      'default passkey
     Private inactive_color As Color = Color.FromArgb(197, 197, 197)
     Private active_color As Color = Color.FromArgb(219, 219, 219)
+    'connection state variable
+    Public connect_using As ConnectState = ConnectState.CONNECT_NORMAL
     'connection method states
     Enum ConnectState
         CONNECT_DEFAULT
@@ -20,18 +21,9 @@ Public Class Form1
         CONNECT_CUSTOM
     End Enum
 
-    'connection state variable
-    Public connect_using As ConnectState = ConnectState.CONNECT_NORMAL
-
     Sub loadForm()
         If My.Settings.ssidCollection Is Nothing Then
             My.Settings.ssidCollection = New Specialized.StringCollection
-        End If
-        If My.Settings.pryKeyCollection Is Nothing Then
-            My.Settings.pryKeyCollection = New Specialized.StringCollection
-        End If
-        If My.Settings.secKeyCollection Is Nothing Then
-            My.Settings.secKeyCollection = New Specialized.StringCollection
         End If
 
         On Error Resume Next
@@ -117,16 +109,20 @@ Public Class Form1
         'if button caption is CONNECT
         If Button2.Text.ToUpper() = "CONNECT" Then
             'SSID should select inorder to connect
-            If Not cmbSSID.SelectedItem Is Nothing Then
-                curr_ssid = cmbSSID.SelectedItem
-                MsgBox("try to connect using primary..")
+            Dim ssid = cmbSSID.Text
+            If Not ssid Is Nothing Then
+                curr_ssid = ssid
+                'MsgBox("try to connect using primary..")
                 serviceHandler()
             End If
         End If
 
         'if button caption is DISCONNECT
         If Button2.Text.ToUpper() = "DISCONNECT" Then
-            ServiceController1.Stop()
+            ServiceController1.Refresh()
+            If ServiceController1.Status = ServiceControllerStatus.Running Then
+                ServiceController1.Stop()
+            End If
         End If
 
 
@@ -135,45 +131,44 @@ Public Class Form1
     'handle the service while connecting -- send passwords to service and try to connect
     Sub serviceHandler()
         If Not My.Settings.ssidCollection.Contains(curr_ssid) And connect_using = ConnectState.CONNECT_NORMAL Then
-            MsgBox("connect using default")
+            'MsgBox("connect using default")
             connect_using = ConnectState.CONNECT_DEFAULT
         End If
 
-        curr_passKey = getPassKey(curr_ssid)
+        Dim curr_passKey As String = getPassKey(curr_ssid)
 
 
         If curr_passKey.Length < 5 And connect_using = ConnectState.CONNECT_CUSTOM Then
             connect_using = ConnectState.CONNECT_NORMAL 'handles user input key errors
         Else
-            startService(curr_ssid, curr_passKey(0), curr_passKey(1))
+            Dim keyIndex As Integer = 0
+            If My.Settings.secKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(curr_ssid) Then
+                keyIndex = My.Settings.ssidCollection.IndexOf(curr_ssid)
+            End If
+            startService(curr_ssid, keyIndex, curr_passKey) 'args- (SSID,keyIndex,[Cumstom passkey])
         End If
     End Sub
 
     'get passkeys according to states DIFAULT / NORMAL / CUSTOM
-    Function getPassKey(ByVal ssid As String) As String()
-        Dim passKey As String() = {"", ""}
+    Function getPassKey(ByVal ssid As String) As String
+        Dim passKey As String = ""
 
         Select Case connect_using
             Case ConnectState.CONNECT_DEFAULT
-                MsgBox("connect default mode")
-                passKey(0) = default_passKey
+                'MsgBox("connect default mode")
+                passKey = default_passKey
             Case ConnectState.CONNECT_NORMAL
-                MsgBox("connect normal mode")
-                If My.Settings.pryKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
-                    passKey(0) = My.Settings.pryKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
-                End If
-                If My.Settings.secKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(ssid) Then
-                    passKey(1) = My.Settings.secKeyCollection(My.Settings.ssidCollection.IndexOf(ssid))
-                End If
+                'MsgBox("connect normal mode")
+                passKey = ""
             Case ConnectState.CONNECT_CUSTOM
-                MsgBox("connect custom mode")
+                'MsgBox("connect custom mode")
                 Dim result = InputBox("Please enter passkey")
-                passKey(0) = result
+                passKey = result
         End Select
         Return passKey
     End Function
 
-    Sub startService(ByVal ssid As String, ByVal pKey As String, ByVal sKey As String)
+    Sub startService(ByVal ssid As String, ByVal keyIndex As Integer, Optional ByVal customKey As String = "")
         Try
             ServiceController1.ServiceName = "Quota2"
             Try
@@ -191,7 +186,7 @@ Public Class Form1
 
                 'if the service is stopped then only try to start the service
                 If (ServiceController1.Status = ServiceControllerStatus.Stopped) Then
-                    ServiceController1.Start({ssid, pKey, sKey})
+                    ServiceController1.Start({ssid, keyIndex, customKey})
                 End If
             Else
                 ServiceController1.Stop()
@@ -208,10 +203,13 @@ Public Class Form1
     End Sub
     Public Sub processLog(ByVal [source] As Object, ByVal e As EntryWrittenEventArgs)
         With e.Entry
-            MsgBox(.Message)
+            'MsgBox("Service said: " & vbNewLine & .Message, MsgBoxStyle.Information)
             If .Message.Contains("#CONNECTED") Then
+                connect_using = ConnectState.CONNECT_NORMAL
+                'saving last connected ssid
+                My.Settings.bssid = curr_ssid
                 If Not My.Settings.ssidCollection.Contains(curr_ssid) Then
-                    MsgBox("you are connectd using default key")
+                    'MsgBox("you are connectd using default key")
                 End If
             End If
 
@@ -230,6 +228,14 @@ Public Class Form1
                         connect_using = ConnectState.CONNECT_NORMAL
                 End Select
             End If
+
+            If .Message.Contains("#MSG:") Then
+                Dim msg = .Message.Split(":")
+                If (msg.Length > 3) Then
+                    MsgBox(msg(1), Integer.Parse(msg(2)), msg(3))
+                End If
+            End If
+
         End With
 
 
@@ -247,6 +253,9 @@ Public Class Form1
                 cmbSSID.Items.Add(ssid)
             End If
         Next
+        If cmbSSID.Items.Contains(My.Settings.bssid) Then
+            cmbSSID.SelectedItem = My.Settings.bssid
+        End If
     End Sub
 
     Private Shared Function Encode(ssid As String) As String
@@ -376,6 +385,15 @@ Public Class Form1
         btnPayment.BackColor = active_color
 
         tabControl.SelectedIndex = 5
+
+    End Sub
+
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        MsgBox("aa" & Integer.Parse(MsgBoxStyle.Exclamation), 48)
+
+    End Sub
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
     End Sub
 End Class
