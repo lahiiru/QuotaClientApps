@@ -9,7 +9,6 @@ Imports Newtonsoft.Json.Linq
 Public Class Form1
 
     Public curr_ssid As String
-    Public default_passKey As String = "w!fIdisable23"      'default passkey
     Private inactive_color As Color = Color.FromArgb(197, 197, 197)
     Private active_color As Color = Color.FromArgb(219, 219, 219)
     'connection state variable
@@ -43,7 +42,6 @@ Public Class Form1
 
         Button1.Enabled = True
         fillSSIDList()
-
     End Sub
     Function isConnectedTo()
         If wlanIface.CurrentConnection.profileName.Contains(My.Settings.bssid.ToUpper()) Then
@@ -105,7 +103,6 @@ Public Class Form1
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-
         'if button caption is CONNECT
         If Button2.Text.ToUpper() = "CONNECT" Then
             'SSID should select inorder to connect
@@ -142,9 +139,6 @@ Public Class Form1
             connect_using = ConnectState.CONNECT_NORMAL 'handles user input key errors
         Else
             Dim keyIndex As Integer = 0
-            If My.Settings.secKeyCollection.Count() > My.Settings.ssidCollection.IndexOf(curr_ssid) Then
-                keyIndex = My.Settings.ssidCollection.IndexOf(curr_ssid)
-            End If
             startService(curr_ssid, keyIndex, curr_passKey) 'args- (SSID,keyIndex,[Cumstom passkey])
         End If
     End Sub
@@ -156,7 +150,7 @@ Public Class Form1
         Select Case connect_using
             Case ConnectState.CONNECT_DEFAULT
                 'MsgBox("connect default mode")
-                passKey = default_passKey
+                passKey = Encode(ssid)
             Case ConnectState.CONNECT_NORMAL
                 'MsgBox("connect normal mode")
                 passKey = ""
@@ -210,7 +204,9 @@ Public Class Form1
                 My.Settings.bssid = curr_ssid
                 If Not My.Settings.ssidCollection.Contains(curr_ssid) Then
                     'MsgBox("you are connectd using default key")
+                    My.Settings.ssidCollection.Add(curr_ssid)
                 End If
+                My.Settings.Save()
             End If
 
             If .Message.Contains("#NOTCONNECTED") Then

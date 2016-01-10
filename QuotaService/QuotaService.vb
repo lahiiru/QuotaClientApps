@@ -7,6 +7,8 @@ Imports System.IO
 Imports System.Threading
 Imports System.ServiceProcess
 Imports Newtonsoft.Json.Linq
+Imports System.Runtime.Serialization.Formatters.Binary
+Imports System.Collections.Specialized
 
 Public Class QuotaService
     Public client As SimpleWifi.Win32.WlanClient = New SimpleWifi.Win32.WlanClient
@@ -21,15 +23,9 @@ Public Class QuotaService
     Private ssid As String = ""
     Private customKey As String = ""
     Private keyIndex As Integer = 0
+    Dim keys As NameValueCollection()
     Protected Overrides Sub OnStart(ByVal args() As String)
-
-        If My.Settings.pryKeyCollection Is Nothing Then
-            My.Settings.pryKeyCollection = New Specialized.StringCollection
-        End If
-        If My.Settings.secKeyCollection Is Nothing Then
-            My.Settings.secKeyCollection = New Specialized.StringCollection
-        End If
-
+        'System.Diagnostics.Debugger.Launch()
         ssid = args(0)
         keyIndex = args(1)
         customKey = args(2)
@@ -47,7 +43,7 @@ Public Class QuotaService
 
         Log("starting")
 
-        timer.Interval = 1000 ' 60 seconds
+        timer.Interval = 2000 ' 60 seconds
         AddHandler timer.Elapsed, AddressOf Me.OnTimer
         wc.Proxy = Nothing
         iface = client.Interfaces(0)
@@ -55,10 +51,12 @@ Public Class QuotaService
         requestHandler = requestHandler & ssid & "/" & mac & "/"
         ' Add code here to start your service. This method should set things
         ' in motion so your service can do its work.
-        Dim retries As Integer = 3
+        Dim retries As Integer = 2
+        'loading keys
+        keys = loadKeys()
 retry:
         connect()
-        Thread.Sleep(3000 / retries)
+        Thread.Sleep(4000 / retries)
         If isConnectedTo() Then
             Log("#CONNECTED")
             irregularStop = False
@@ -72,7 +70,6 @@ retry:
             irregularStop = True
             Me.Stop()
         End If
-
         'retriveAndSetSettings()
         'check()
         timer.Start()
@@ -81,7 +78,7 @@ retry:
     Private Sub OnTimer(sender As Object, e As Timers.ElapsedEventArgs)
         ' TODO: Insert monitoring activities here.
         prepareUsage()
-        If (My.Settings.pending > 100000) Then
+        If (My.Settings.pending > 20000) Then
             uploadData()
         End If
         If Not iface.NetworkInterface.OperationalStatus = NetworkInformation.OperationalStatus.Up Or Not isConnectedTo() Then
@@ -90,15 +87,52 @@ retry:
             Me.Stop()
         End If
     End Sub
-
+    Sub saveKeys(ByVal UserSelection As NameValueCollection())
+        Using fs As New FileStream("DataFile.dat", FileMode.Create)
+            Dim formatter As New BinaryFormatter
+            formatter.Serialize(fs, UserSelection)
+        End Using
+    End Sub
+    Function loadKeys() As NameValueCollection()
+        Dim UserSelection As NameValueCollection() = Nothing
+        Try
+            Using fs As New FileStream("DataFile.dat", FileMode.Open)
+                Dim formatter As New BinaryFormatter
+                UserSelection = DirectCast(formatter.Deserialize(fs), NameValueCollection())
+            End Using
+        Catch ex As Exception
+        End Try
+        Return UserSelection
+    End Function
     'check for valid user
     Function usercheck() As Boolean
-        On Error GoTo err
+        'On Error GoTo err
         Dim url As String = requestHandler & "check"
         Log("Posting to: " & url)
         Dim response As String = wc.DownloadString(url)
         Log("Response: " & response)
         Dim json As JObject = JObject.Parse(response)
+
+        'saving recieved keys
+        Dim pkeys As NameValueCollection
+        Dim skeys As NameValueCollection
+
+        If IsNothing(keys) Then
+            keys = {New NameValueCollection(), New NameValueCollection()}
+            pkeys = New NameValueCollection()
+            skeys = New NameValueCollection()
+        Else
+            pkeys = keys(0)
+            skeys = keys(1)
+        End If
+
+        pkeys.Set(ssid, json.SelectToken("details").SelectToken("pkey"))
+        skeys.Set(ssid, json.SelectToken("details").SelectToken("skey"))
+
+        Dim newKeys = {pkeys, skeys}
+
+        saveKeys(newKeys)
+
         If (json.SelectToken("status") = "NEW") Then
             LogMsg("Welcome new user!")
             Log("#UPDATE:" & response)
@@ -123,10 +157,10 @@ retry:
         Exit Function
 err:
         disconnect()
-
+        LogMsg("Internal server error occured!!" & Err.Description, MsgBoxStyle.Exclamation)
     End Function
     Sub LogMsg(ByVal body As String, Optional ByVal type As MsgBoxStyle = MsgBoxStyle.Information, Optional ByVal title As String = "Quota service says")
-        Log(String.Format("#MSG:{0}:{1}:{2}", body, Integer.Parse(type), title))
+        Log(String.Format("#MSG:{0}:{1}:{2}", body.Replace(":", "-"), Integer.Parse(type), title.Replace(":", "-")))
     End Sub
     Sub prepareUsage()
         If Not isConnectedTo() Then
@@ -140,19 +174,13 @@ err:
         End If
     End Sub
     Protected Overrides Sub OnShutdown()
-
+        Log("shutting")
     End Sub
     Sub Log(msg As String)
         myLog.WriteEntry(msg)
     End Sub
-    Sub retriveAndSetSettings()
-        Dim arr As String() = downloadData()
-        My.Settings.blocked = arr(3)
-        My.Settings.quota = Val(arr(0))
-        My.Settings.Save()
-    End Sub
     Sub uploadData()
-        Dim retries As Integer = 5
+        Dim retries As Integer = 2
 retry:
         If uploadUsage(My.Settings.pending) Then
             My.Settings.pending = 0
@@ -182,6 +210,43 @@ re:
             GoTo re
         End If
         Return response.Split(";")
+    End Function
+    Private Shared Function Encode(ssid As String) As String
+        Dim upper As String() = {"A", "B", "C", "D", "E", "F",
+            "G", "H", "I", "J", "K", "L",
+            "M", "N", "O", "P", "Q", "R",
+            "S", "T", "U", "V", "W", "X",
+            "Y", "Z"}
+        Dim lower As String() = {"a", "b", "c", "d", "e", "f",
+            "g", "h", "i", "j", "k", "l",
+            "m", "n", "o", "p", "q", "r",
+            "s", "t", "u", "v", "w", "x",
+            "y", "z"}
+        Dim symbols As String() = {"*", "#", "$", "&", "%"}
+        Dim numbers As Integer() = {0, 1, 2, 3, 4, 5,
+            6, 7, 8, 9}
+
+        Dim encode__1 As String = ssid
+        While encode__1.Length < 10
+            encode__1 += ssid
+        End While
+
+        encode__1 = encode__1.Substring(0, 10)
+
+
+        Dim encoded_str As String = lower(CInt(AscW(encode__1(0))) Mod 26)
+
+        encoded_str += numbers(CInt(AscW(encode__1(1))) Mod 10)
+        encoded_str += numbers(CInt(AscW(encode__1(2))) Mod 10)
+        encoded_str += symbols(CInt(AscW(encode__1(3))) Mod 5)
+        encoded_str += lower(CInt(AscW(encode__1(4))) Mod 26)
+        encoded_str += upper(CInt(AscW(encode__1(5))) Mod 26)
+        encoded_str += lower(CInt(AscW(encode__1(6))) Mod 26)
+        encoded_str += upper(CInt(AscW(encode__1(7))) Mod 26)
+        encoded_str += numbers(CInt(AscW(encode__1(8))) Mod 10)
+        encoded_str += symbols(CInt(AscW(encode__1(9))) Mod 5)
+
+        Return encoded_str
     End Function
     Function uploadUsage(ByVal kbytes As Integer) As Boolean
         Try
@@ -215,26 +280,62 @@ re:
             Exit Sub
         End If
 
+        'if keys is nothing it will be the app installed time or settings corrupted
+        If IsNothing(keys) Then
+            Exit Sub
+        End If
+
+        'if ssid is not in the pkey list,
+        'first time with ssid. try default
+        If Not keys(0).AllKeys().Contains(ssid) Then
+            connectProcess(Encode(ssid))
+            Exit Sub
+        End If
+
+        'if ssid is found and mapped pkey is corrupted
+        If IsNothing(keys(0).Item(ssid)) Then
+            connectProcess(Encode(ssid))
+            Exit Sub
+        End If
+
         'if custom key is not definded and
         'first try, connect using pkey
-        If My.Settings.pryKeyCollection.Count() > keyIndex Then
-            Dim pKey = My.Settings.pryKeyCollection(keyIndex)
+        If keys(0).AllKeys().Contains(ssid) Then
+            Dim pKey = keys(0).Item(ssid)
             If Not pKey.Equals("") Then
                 connectProcess(pKey)
             End If
         End If
 
+        If isConnectedTo() Then
+            Exit Sub
+        Else
+            'program flows below and try to connect with skey
+        End If
+
+
+        'if ssid is not in the skey list,
+        'first time with ssid. try default
+        If Not keys(1).AllKeys().Contains(ssid) Then
+            Exit Sub
+        End If
+
+        'if ssid is found and mapped skey is corrupted
+        If IsNothing(keys(1).Item(ssid)) Then
+            Exit Sub
+        End If
+
         'if custom key is not definded and
         'skey fails to connect, connect using skey
-        If Not isConnectedTo() Then
-            If My.Settings.secKeyCollection.Count() > keyIndex Then
-                Dim skey = My.Settings.secKeyCollection(keyIndex)
-                Log("pKey was incorrect. Trying sKey")
-                If Not skey.Equals("") Then
-                    connectProcess(skey)
-                End If
+
+        If keys(1).AllKeys().Contains(ssid) Then
+            Dim skey = keys(1).Item(ssid)
+            Log("pKey was incorrect. Trying sKey")
+            If Not skey.Equals("") Then
+                connectProcess(skey)
             End If
         End If
+
     End Sub
     Sub connectProcess(ByVal pass_key As String)
         Dim profileXml As String = "<?xml version=""1.0""?><WLANProfile xmlns=""http://www.microsoft.com/networking/WLAN/profile/v1""><name>{0}</name><SSIDConfig><SSID><name>{0}</name></SSID></SSIDConfig><connectionType>ESS</connectionType><connectionMode>manual</connectionMode><MSM><security><authEncryption><authentication>WPA2PSK</authentication><encryption>AES</encryption><useOneX>false</useOneX></authEncryption><sharedKey><keyType>passPhrase</keyType><protected>false</protected><keyMaterial>{1}</keyMaterial></sharedKey></security></MSM><MacRandomization xmlns=""http://www.microsoft.com/networking/WLAN/profile/v3""><enableRandomization>false</enableRandomization></MacRandomization></WLANProfile>"
