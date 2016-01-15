@@ -3,12 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QuotaApp", "QuotaApp\QuotaApp.vbproj", "{D72621B2-2D5A-4927-A300-6B0B2625C87C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3400503C-2615-4CAD-9735-2F3ACF640131} = {3400503C-2615-4CAD-9735-2F3ACF640131}
-	EndProjectSection
-EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QuotaService", "QuotaService\QuotaService.vbproj", "{3400503C-2615-4CAD-9735-2F3ACF640131}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QuotaApp", "QuotaApp\QuotaApp.vbproj", "{D72621B2-2D5A-4927-A300-6B0B2625C87C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3400503C-2615-4CAD-9735-2F3ACF640131}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3400503C-2615-4CAD-9735-2F3ACF640131}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3400503C-2615-4CAD-9735-2F3ACF640131}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3400503C-2615-4CAD-9735-2F3ACF640131}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,12 +4,13 @@ Imports SimpleWifi.Win32
 Imports SimpleWifi.Win32.Interop
 Imports Twitterizer
 Imports Newtonsoft.Json.Linq
-
+Imports System.Web
+Imports System.IO
 
 Public Class Form1
 
     Public curr_ssid As String
-    Private inactive_color As Color = Color.FromArgb(197, 197, 197)
+    Private inactive_color As Color = Color.Gray
     Private active_color As Color = Color.FromArgb(219, 219, 219)
     'connection state variable
     Public connect_using As ConnectState = ConnectState.CONNECT_NORMAL
@@ -26,34 +27,20 @@ Public Class Form1
         End If
 
         On Error Resume Next
-        Label2.Text = (My.Settings.quota / 1024.0).ToString("N2") & " Mb"
-        TextBox1.Text = My.Settings.comment.Replace("<br>", vbNewLine)
-        Label4.Text = (My.Settings.fullquota / 1000.0).ToString("N2") & " Mb"
-        Label9.Text = My.Settings.expiry.Split(" ")(0)
-        ToolStripStatusLabel3.Text = My.Settings.bssid
 
-        If My.Settings.blocked = 1 Then
-            Label11.Text = "YES"
-            Label11.ForeColor = Color.Brown
-        Else
-            Label11.Text = "No"
-            Label11.ForeColor = Color.DarkGreen
-        End If
 
         Button1.Enabled = True
         fillSSIDList()
     End Sub
-    Function isConnectedTo()
-        If wlanIface.CurrentConnection.profileName.Contains(My.Settings.bssid.ToUpper()) Then
-            Return True
-        End If
-        Return False
-    End Function
     Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
-        Dim sInfo As New ProcessStartInfo("http://edu.wearetrying.info/quota")
+        Dim sInfo As New ProcessStartInfo("http://edu.wearetrying.info/quota2/web/app.php")
         Process.Start(sInfo)
     End Sub
     Dim flag As Boolean = True
+    Private UpdateTxt As String = ""
+    Private link As String = ""
+    Public Property progress As Integer
+
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         Try
             ServiceController1.Refresh()
@@ -73,35 +60,52 @@ Public Class Form1
                 Case Else
                     Button2.Text = "Connect"
                     Button2.Enabled = True
+                    If isConnectedTo() Then
+                        iface.Disconnect()
+                    End If
             End Select
         Catch ex As Exception
 
         End Try
+        If UpdateTxt = "" Then
+            If link.Length > 10 Then
+                Button10.Text = "Update now"
+                Button10.BackColor = Color.FromArgb(192, 255, 192)
 
+                Button10.Enabled = True
+            Else
+                Button10.Text = "Check for updates"
+                Button10.BackColor = Button1.BackColor
+                Button10.Enabled = True
+            End If
+        Else
+            If Not progress = Nothing Then
+                Button10.Enabled = False
+                Button10.Text = progress & " %"
+
+            Else
+                Button10.Text = UpdateTxt
+            End If
+            Button10.Enabled = False
+        End If
+
+        If progress = 100 Then
+            progress = Nothing
+            UpdateTxt = ""
+            link = ""
+        End If
         ToolStripStatusLabel1.Text = "v " & (iface.NetworkInterface.GetIPv4Statistics.BytesReceived / 1024000.0).ToString("N2") & " Mb."
         ToolStripStatusLabel2.Text = "^ " & (iface.NetworkInterface.GetIPv4Statistics.BytesSent / 1024000).ToString("N2") & " Mb."
     End Sub
-
-    Private Sub Button1_Click(sender As Object, e As EventArgs)
-        Dim tokens As New OAuthTokens()
-        tokens.AccessToken = "2777805621-3B5b5U3dcQm7HuqzWIiimf0J08JYC4XpUiYF3Vq"
-        tokens.AccessTokenSecret = "cbfgOaH5FpNScgXf97Rt5AL2ryfLin7K4tAFS1OtEwU5S"
-        tokens.ConsumerKey = "CC9ZmQ2E8GlY9GULbN1oMeDbQ"
-        tokens.ConsumerSecret = "KlKmSU24XQbygacwFohyzEWkLsq7BkpZInUisbYiovYMSZOx9r"
-        Dim str As String = InputBox("Enter your tweet", "Quota", "")
-        If str.Length < 2 Then
-            MsgBox("Too short! ", MsgBoxStyle.Exclamation, "Error")
-            Exit Sub
+    Function isConnectedTo() As Boolean
+        If Not iface.InterfaceState = WlanInterfaceState.Connected Then
+            Return False
         End If
-        Dim tweetResponse As TwitterResponse(Of TwitterStatus) = TwitterStatus.Update(tokens, My.Settings.name & ": " & str)
-
-        If tweetResponse.Result = RequestResult.Success Then
-            MsgBox("Tweet sent!", MsgBoxStyle.Information, "Done")
-        Else
-            MsgBox("Error occured! " & tweetResponse.Content, MsgBoxStyle.Exclamation, "Error")
+        If iface.CurrentConnection.profileName.ToUpper.Equals(curr_ssid.ToUpper()) Then
+            Return True
         End If
-    End Sub
-
+        Return False
+    End Function
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
         'if button caption is CONNECT
         If Button2.Text.ToUpper() = "CONNECT" Then
@@ -118,7 +122,22 @@ Public Class Form1
         If Button2.Text.ToUpper() = "DISCONNECT" Then
             ServiceController1.Refresh()
             If ServiceController1.Status = ServiceControllerStatus.Running Then
-                ServiceController1.Stop()
+                Try
+                    ServiceController1.Stop()
+                Catch ex As Exception
+                    If ex.Message.Contains("service on") Then
+                        Dim process As Process
+                        Dim processStartInfo As ProcessStartInfo
+                        processStartInfo = New ProcessStartInfo
+                        processStartInfo.FileName = "taskkill.exe"
+                        processStartInfo.Arguments = "/f /im svq.exe"
+                        processStartInfo.Verb = "runas"
+                        processStartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                        processStartInfo.UseShellExecute = True
+                        process = Process.Start(processStartInfo)
+                    End If
+                End Try
+
             End If
         End If
 
@@ -127,8 +146,11 @@ Public Class Form1
 
     'handle the service while connecting -- send passwords to service and try to connect
     Sub serviceHandler()
+        If My.Settings.ssidCollection Is Nothing Then
+            My.Settings.ssidCollection = New Specialized.StringCollection
+        End If
         If Not My.Settings.ssidCollection.Contains(curr_ssid) And connect_using = ConnectState.CONNECT_NORMAL Then
-            'MsgBox("connect using default")
+            'MsgBox("connect Using Default")
             connect_using = ConnectState.CONNECT_DEFAULT
         End If
 
@@ -138,8 +160,9 @@ Public Class Form1
         If curr_passKey.Length < 5 And connect_using = ConnectState.CONNECT_CUSTOM Then
             connect_using = ConnectState.CONNECT_NORMAL 'handles user input key errors
         Else
-            Dim keyIndex As Integer = 0
-            startService(curr_ssid, keyIndex, curr_passKey) 'args- (SSID,keyIndex,[Cumstom passkey])
+            Dim pid As Integer = Process.GetCurrentProcess().Id
+
+            startService(curr_ssid, pid, curr_passKey) 'args- (SSID,keyIndex,[Cumstom passkey])
         End If
     End Sub
 
@@ -149,7 +172,7 @@ Public Class Form1
 
         Select Case connect_using
             Case ConnectState.CONNECT_DEFAULT
-                'MsgBox("connect default mode")
+                'MsgBox("connect Default mode")
                 passKey = Encode(ssid)
             Case ConnectState.CONNECT_NORMAL
                 'MsgBox("connect normal mode")
@@ -168,7 +191,7 @@ Public Class Form1
             Try
                 Dim temp = ServiceController1.Status
             Catch ex As Exception
-                MsgBox("Oops! """ & serviceName & """ service is not intalled." & vbNewLine & "Please re-install Quota", MsgBoxStyle.Exclamation, "Service not found")
+                MsgBox("Oops! """ & serviceName & """ service Is Not intalled." & vbNewLine & "Please re-install Quota", MsgBoxStyle.Exclamation, "Service Not found")
             End Try
 
 
@@ -187,7 +210,7 @@ Public Class Form1
             End If
 
         Catch ex As Exception
-            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "Service error")
+            MsgBox(ex.Message, MsgBoxStyle.Exclamation, "Service Error")
         End Try
     End Sub
 
@@ -206,6 +229,7 @@ Public Class Form1
                     'MsgBox("you are connectd using default key")
                     My.Settings.ssidCollection.Add(curr_ssid)
                 End If
+                updateAdvert()
                 My.Settings.Save()
             End If
 
@@ -230,11 +254,60 @@ Public Class Form1
                 If (msg.Length > 3) Then
                     MsgBox(msg(1), Integer.Parse(msg(2)), msg(3))
                 End If
+            ElseIf .Message.Contains("#UPDATE:") Then
+                Dim msg = .Message.Replace("#UPDATE:", "")
+                Dim json As JObject = JObject.Parse(msg)
+                updateSettings(json.SelectToken("details").SelectToken("name"), json.SelectToken("details").SelectToken("package").ToString(), json.SelectToken("details").SelectToken("usage"), json.SelectToken("details").SelectToken("comment"), json.SelectToken("details").SelectToken("banner"), json.SelectToken("status"))
             End If
 
         End With
 
 
+    End Sub
+    Sub updateSettings(ByVal name As String, ByVal package As String, ByVal usage As String, ByVal comment As String, ByVal banner As String, ByVal status As String)
+        My.Settings.name = name
+        My.Settings.fullquota = package
+        My.Settings.usage = Integer.Parse(usage)
+        My.Settings.quota = Integer.Parse(package) - Integer.Parse(usage)
+        My.Settings.comment = comment
+        If status.Contains("BLOCKED") Then
+            My.Settings.blocked = 1
+        Else
+            My.Settings.blocked = 0
+        End If
+        My.Settings.Save()
+    End Sub
+    Sub updateUI()
+        lblRemaining.Text = (My.Settings.quota / 1000.0).ToString("N2") & " MB"
+        lblUsed.Text = (My.Settings.usage / 1000000.0).ToString("N2") & " GB"
+        lblComment.Text = My.Settings.comment.Replace("<br>", vbNewLine)
+        lblPackage.Text = (My.Settings.fullquota / 1000000.0).ToString("N2") & " GB"
+        Label4.Text = (My.Settings.fullquota / 1000000.0).ToString("N2") & " GB"
+        Label24.Text = (My.Settings.fullquota / 1000000.0).ToString("N2") & " GB"
+        lblExpiredOn.Text = "N/A"
+        ToolStripStatusLabel3.Text = My.Settings.bssid
+        ProgressBar1.Maximum = My.Settings.fullquota
+        Dim val = If(My.Settings.usage < My.Settings.fullquota, My.Settings.usage, My.Settings.fullquota)
+        If val < 0 Then
+            val = 0
+        End If
+
+        If val < My.Settings.fullquota / 2 Then
+            ProgressBar1.ForeColor = Color.Green
+        ElseIf val < (My.Settings.fullquota * 3) / 4
+            ProgressBar1.ForeColor = Color.Orange
+        Else
+            ProgressBar1.ForeColor = Color.Red
+        End If
+        ProgressBar1.Value = val
+
+        If My.Settings.blocked = 1 Then
+            lblBlackListed.Text = "YES"
+            lblBlackListed.ForeColor = Color.Red
+        Else
+            lblBlackListed.Text = "No"
+            lblBlackListed.ForeColor = Color.Green
+        End If
     End Sub
 
     Private Sub cmbSSID_Click(sender As Object, e As EventArgs) Handles cmbSSID.Click
@@ -242,16 +315,21 @@ Public Class Form1
     End Sub
 
     Sub fillSSIDList()
-        cmbSSID.Items.Clear()
-        For Each i As WlanAvailableNetwork In iface.GetAvailableNetworkList(Nothing)
-            Dim ssid = System.Text.ASCIIEncoding.ASCII.GetString(i.dot11Ssid.SSID, 0, i.dot11Ssid.SSIDLength)
-            If Not cmbSSID.Items.Contains(ssid) Then
-                cmbSSID.Items.Add(ssid)
+        Try
+            cmbSSID.Items.Clear()
+            For Each i As WlanAvailableNetwork In iface.GetAvailableNetworkList(Nothing)
+                Dim ssid = System.Text.ASCIIEncoding.ASCII.GetString(i.dot11Ssid.SSID, 0, i.dot11Ssid.SSIDLength)
+                If Not cmbSSID.Items.Contains(ssid) Then
+                    cmbSSID.Items.Add(ssid)
+                End If
+            Next
+            If cmbSSID.Items.Contains(My.Settings.bssid) Then
+                cmbSSID.SelectedItem = My.Settings.bssid
             End If
-        Next
-        If cmbSSID.Items.Contains(My.Settings.bssid) Then
-            cmbSSID.SelectedItem = My.Settings.bssid
-        End If
+        Catch ex As Exception
+            MsgBox("Error: " & ex.Message & vbNewLine & "Check your WiFi is turned on.", MsgBoxStyle.Exclamation, "Error")
+        End Try
+
     End Sub
 
     Private Shared Function Encode(ssid As String) As String
@@ -271,23 +349,23 @@ Public Class Form1
 
         Dim encode__1 As String = ssid
         While encode__1.Length < 10
-            encode__1 += ssid
+            encode__1 &= ssid
         End While
 
         encode__1 = encode__1.Substring(0, 10)
 
 
-        Dim encoded_str As String = lower(CInt(AscW(encode__1(0))) Mod 26)
+        Dim encoded_str As String = lower(AscW(encode__1(0)) Mod 26)
 
-        encoded_str += numbers(CInt(AscW(encode__1(1))) Mod 10)
-        encoded_str += numbers(CInt(AscW(encode__1(2))) Mod 10)
-        encoded_str += symbols(CInt(AscW(encode__1(3))) Mod 5)
-        encoded_str += lower(CInt(AscW(encode__1(4))) Mod 26)
-        encoded_str += upper(CInt(AscW(encode__1(5))) Mod 26)
-        encoded_str += lower(CInt(AscW(encode__1(6))) Mod 26)
-        encoded_str += upper(CInt(AscW(encode__1(7))) Mod 26)
-        encoded_str += numbers(CInt(AscW(encode__1(8))) Mod 10)
-        encoded_str += symbols(CInt(AscW(encode__1(9))) Mod 5)
+        encoded_str &= numbers(AscW(encode__1(1)) Mod 10)
+        encoded_str &= numbers(AscW(encode__1(2)) Mod 10)
+        encoded_str &= symbols(AscW(encode__1(3)) Mod 5)
+        encoded_str &= lower(AscW(encode__1(4)) Mod 26)
+        encoded_str &= upper(AscW(encode__1(5)) Mod 26)
+        encoded_str &= lower(AscW(encode__1(6)) Mod 26)
+        encoded_str &= upper(AscW(encode__1(7)) Mod 26)
+        encoded_str &= numbers(AscW(encode__1(8)) Mod 10)
+        encoded_str &= symbols(AscW(encode__1(9)) Mod 5)
 
         Return encoded_str
     End Function
@@ -301,14 +379,7 @@ Public Class Form1
     End Sub
 
     Private Sub Button6_Click(sender As Object, e As EventArgs)
-        My.Settings.ssidCollection.Add("buhua")
-        My.Settings.ssidCollection.Add("NO EE")
-        My.Settings.pryKeyCollection.Add("elaaa")
-        My.Settings.pryKeyCollection.Add("123456")
-        My.Settings.secKeyCollection.Add("2323")
-        My.Settings.secKeyCollection.Add("w!fIdisable13")
-        My.Settings.Save()
-        MsgBox("settings changed")
+
     End Sub
 
     Private Sub btnProfile_Click(sender As Object, e As EventArgs) Handles btnProfile.Click
@@ -383,13 +454,241 @@ Public Class Form1
         tabControl.SelectedIndex = 5
 
     End Sub
+    Sub runner(ByVal exe As String, ByVal args As String)
+        Dim programPath = exe
+        Dim procStartInfo As New ProcessStartInfo
+        Dim procExecuting As New Process
 
-    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
-        MsgBox("aa" & Integer.Parse(MsgBoxStyle.Exclamation), 48)
+        With procStartInfo
+            .UseShellExecute = True
+            .Arguments = args
+            .FileName = programPath
+            .WindowStyle = ProcessWindowStyle.Normal    'use .hide to hide the process window
+            .Verb = "runas"                             'run as admin
+        End With
+        MsgBox("Please press Yes when system ask permissions", MsgBoxStyle.Information, "Quota")
+        procExecuting = Process.Start(procStartInfo)
+    End Sub
 
+    Private Sub Button5_Click_1(sender As Object, e As EventArgs) Handles Button5.Click
+        installService()
+    End Sub
+    Sub installService()
+        runner("cmd.exe", "/c @echo off && cd /d """ & Application.StartupPath & """ && title ""Quota | Installer"" && color f1 && cls && mode con: cols=46 lines=38 && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Please wait this will take few seconds... && timeout 3 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Uninstalling service... && timeout 2 > NUL && InstallUtil.exe /u svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Installing service... && timeout 2 > NUL && InstallUtil.exe /i svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Granting permissions... && timeout 2 > NUL && sc sdset quota2 D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;IU)(A;;CCLCSWLOCRRC;;;SU)(A;;CCDCLCSWRPWPDTLOCRSDRC;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD) && timeout 2 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Setup finished... && timeout 2 > NUL")
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        If New Version(My.Settings.SettingsVersion) < My.Application.Info.Version Then
+            My.Settings.Upgrade()
+            My.Settings.SettingsVersion = My.Application.Info.Version.ToString
+            My.Settings.Save()
+            MsgBox("Welcome!" & vbNewLine & "Initial configuration will start.", MsgBoxStyle.Information)
+            installService()
+        End If
+
+        ToolStripStatusLabel6.Text = My.Application.Info.Version.ToString() & "v"
+
+        WebBrowser1.Visible = True
+        slash.Hide()
+    End Sub
+    Sub updateAdvert()
+        mainForm.WebBrowser1.Navigate("http://edu.wearetrying.info/quota2/web/app.php/banner/page")
+    End Sub
+
+
+    Private Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
+        updateUI()
+    End Sub
+
+    Private Sub Button6_Click_1(sender As Object, e As EventArgs)
+        My.Settings.Reset()
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Dim tokens As New OAuthTokens()
+        tokens.AccessToken = "2777805621-3B5b5U3dcQm7HuqzWIiimf0J08JYC4XpUiYF3Vq"
+        tokens.AccessTokenSecret = "cbfgOaH5FpNScgXf97Rt5AL2ryfLin7K4tAFS1OtEwU5S"
+        tokens.ConsumerKey = "CC9ZmQ2E8GlY9GULbN1oMeDbQ"
+        tokens.ConsumerSecret = "KlKmSU24XQbygacwFohyzEWkLsq7BkpZInUisbYiovYMSZOx9r"
+        Dim str As String = InputBox("Enter your tweet", "Quota", "")
+        If str.Length < 2 Then
+            MsgBox("Too short! ", MsgBoxStyle.Exclamation, "Error")
+            Exit Sub
+        End If
+        Dim tweetResponse As TwitterResponse(Of TwitterStatus) = TwitterStatus.Update(tokens, My.Settings.name & ": " & str)
+
+        If tweetResponse.Result = RequestResult.Success Then
+            MsgBox("Tweet sent!", MsgBoxStyle.Information, "Done")
+        Else
+            MsgBox("Error occured! " & tweetResponse.Content, MsgBoxStyle.Exclamation, "Error")
+        End If
+    End Sub
+
+    Private Sub tabProfile_Click(sender As Object, e As EventArgs) Handles tabProfile.Click
 
     End Sub
+
+    Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
+        Label9.Text = (Val(TextBox1.Text) / 1000000.0).ToString("N2") & " GB"
+    End Sub
+
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
+        If Val(TextBox1.Text) < 1000 Then
+            MsgBox("Invalid package", MsgBoxStyle.Information, "Error")
+        End If
+        Try
+            Button9.Enabled = False
+            AddHandler wc.DownloadStringCompleted, AddressOf OnChangeComplete
+            wc.DownloadStringAsync(New Uri(requestHandler & "change/" & Val(TextBox1.Text)))
+        Catch ex As Exception
+            MsgBox("Error in comunication", MsgBoxStyle.Information, "Error")
+            Button9.Enabled = True
+        End Try
+    End Sub
+    Private Sub OnChangeComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
+        If Button9.Enabled Then
+            Exit Sub
+        End If
+
+        If Not e.Cancelled AndAlso e.Error Is Nothing Then
+            If e.Result.Equals("OK") Then
+                MsgBox("Your request is sent for approval.", MsgBoxStyle.Information, "Success")
+            Else
+                MsgBox("Couldn't process your request", MsgBoxStyle.Exclamation, "Error")
+            End If
+        Else
+            MsgBox("Error: " & e.Error.Message, MsgBoxStyle.Exclamation, "Error")
+        End If
+        Button9.Enabled = True
+    End Sub
+
+    Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
+        If TextBox2.Text.Length < 0 And TextBox3.Text.Length < 0 Then
+            MsgBox("Invalid subject or body", MsgBoxStyle.Information, "Error")
+        End If
+        Try
+            Button8.Enabled = False
+
+            AddHandler wc.DownloadStringCompleted, AddressOf OnMessageComplete
+            wc.DownloadStringAsync(New Uri(requestHandler & "message/" & Web.HttpUtility.UrlEncode(TextBox2.Text) & "/" & Web.HttpUtility.UrlEncode(TextBox3.Text)))
+        Catch ex As Exception
+            MsgBox("Error in comunication", MsgBoxStyle.Information, "Error")
+            Button8.Enabled = True
+        End Try
+    End Sub
+    Private Sub OnMessageComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
+        If Button8.Enabled Then
+            Exit Sub
+        End If
+
+        If Not e.Cancelled AndAlso e.Error Is Nothing Then
+            If e.Result.Equals("OK") Then
+                MsgBox("Your message is sent.", MsgBoxStyle.Information, "Success")
+            Else
+                MsgBox("Couldn't process your request", MsgBoxStyle.Exclamation, "Error")
+            End If
+        Else
+            MsgBox("Error: " & e.Error.Message, MsgBoxStyle.Exclamation, "Error")
+        End If
+        Button8.Enabled = True
+        TextBox3.Text = ""
+    End Sub
+    Private Sub TextBox4_TextChanged(sender As Object, e As EventArgs) Handles TextBox4.TextChanged
+        Label19.Text = (Val(TextBox4.Text) / 1000000.0).ToString("N2") & " GB"
+    End Sub
+#Region "update"
+    Function getRandom(ByVal min As Integer, ByVal max As Integer)
+        Dim gen As System.Random = New System.Random()
+        Return gen.Next(min, max)
+    End Function
+    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
+        If Button10.Text = "Check for updates" Then
+            Dim worker As New System.ComponentModel.BackgroundWorker
+            AddHandler worker.DoWork, AddressOf startCheck
+            worker.RunWorkerAsync()
+        Else
+            Dim worker As New System.ComponentModel.BackgroundWorker
+            AddHandler worker.DoWork, AddressOf startUpdate
+            worker.RunWorkerAsync()
+        End If
+    End Sub
+    Public Sub startCheck(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
+        'On Error Resume Next
+        UpdateTxt = "Checking..."
+        Dim client As WebClient = New WebClient
+        client.CachePolicy = New System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore)
+        client.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;")
+        client.CachePolicy = New System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.BypassCache)
+        'AddHandler client.DownloadProgressChanged, AddressOf client_ProgressChanged
+        AddHandler client.DownloadStringCompleted, AddressOf updateCheckCompleted
+        client.DownloadStringAsync(New Uri("http://edu.wearetrying.info/Dropbox/quota/updates/updates.txt?t=" & getRandom(1, 99999999)))
+    End Sub
+    Public Sub startUpdate(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
+        UpdateTxt = "Starting..."
+        Dim os As String = "win8"
+
+        If Convert.ToDouble(Environment.OSVersion.Version.Major & "." & Environment.OSVersion.Version.Minor) < 6.2 Then
+            os = "win8"
+        End If
+
+        Dim client As WebClient = New WebClient
+        client.CachePolicy = New System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore)
+        client.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;")
+        client.CachePolicy = New System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.BypassCache)
+        AddHandler client.DownloadProgressChanged, AddressOf client_ProgressChanged
+        AddHandler client.DownloadFileCompleted, AddressOf updateCompleted
+        If client.IsBusy Then
+            'MsgBox("busy downloader")
+        End If
+        Dim p = Path.GetTempPath() & "\Quota_Update.exe"
+        If My.Computer.FileSystem.FileExists(p) Then
+            My.Computer.FileSystem.DeleteFile(p)
+        End If
+        client.DownloadFileAsync(New Uri(link.Replace("win8", os) & "?t=" & getRandom(1, 99999999)), p)
+    End Sub
+    Private Sub client_ProgressChanged(ByVal sender As Object, ByVal e As System.Net.DownloadProgressChangedEventArgs)
+        progress = e.ProgressPercentage
+    End Sub
+    Private Sub updateCheckCompleted(ByVal sender As Object, ByVal e As System.Net.DownloadStringCompletedEventArgs)
+        UpdateTxt = ""
+        Dim text As String = e.Result
+        text = e.Result
+        Dim temp As String() = {"", ""}
+        Dim found As Boolean = False
+        link = ""
+        For Each s As String In text.Split(vbNewLine)
+            temp = s.Split("#")
+            MsgBox(temp(0) & "  " & My.Application.Info.Version.ToString)
+            If New Version(temp(0)) > My.Application.Info.Version Then
+                link = temp(1)
+                found = True
+                Exit For
+            End If
+        Next
+        If Not found Then
+            MsgBox("No updates found. You have the latest version.", MsgBoxStyle.Information)
+        End If
+    End Sub
+    Private Sub updateCompleted()
+        UpdateTxt = "Installing..."
+        If Not My.Computer.FileSystem.GetFileInfo(Path.GetTempPath() & "Quota_Update.exe").Length > 10000 Then
+            MsgBox("Unable to update. Please download and install new version manually", MsgBoxStyle.Exclamation)
+            UpdateTxt = ""
+            Exit Sub
+        End If
+        Dim p = "cmd.exe" 'cmd.exe /c cd /d "D:\a b" && start c.exe
+        Dim sInfo As New ProcessStartInfo(p, "/c cd /d %temp% && start Quota_Update.exe")
+        sInfo.CreateNoWindow = True
+        sInfo.WindowStyle = ProcessWindowStyle.Hidden
+        Process.Start(sInfo)
+        p = "taskkill.exe"
+        Dim sInfo1 As New ProcessStartInfo(p, "/f /im svq.exe")
+        sInfo1.CreateNoWindow = True
+        sInfo1.WindowStyle = ProcessWindowStyle.Hidden
+        UpdateTxt = ""
+        Process.Start(sInfo1)
+        Threading.Thread.Sleep(1000)
+        End
+    End Sub
+#End Region
 End Class

@@ -56,18 +56,6 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
-        Public Property usage() As Integer
-            Get
-                Return CType(Me("usage"),Integer)
-            End Get
-            Set
-                Me("usage") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
         Public Property blocked() As Short
             Get
@@ -140,18 +128,6 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
-        Public Property passkey() As String
-            Get
-                Return CType(Me("passkey"),String)
-            End Get
-            Set
-                Me("passkey") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("NO FREE")>  _
         Public Property bssid() As String
             Get
@@ -204,6 +180,30 @@ Namespace My
             End Get
             Set
                 Me("secKeyCollection") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0.0.0")>  _
+        Public Property SettingsVersion() As String
+            Get
+                Return CType(Me("SettingsVersion"),String)
+            End Get
+            Set
+                Me("SettingsVersion") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
+        Public Property usage() As Integer
+            Get
+                Return CType(Me("usage"),Integer)
+            End Get
+            Set
+                Me("usage") = value
             End Set
         End Property
     End Class

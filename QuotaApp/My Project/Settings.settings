@@ -2,9 +2,6 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="My" GeneratedClassName="MySettings" UseMySettingsClassName="true">
   <Profiles />
   <Settings>
-    <Setting Name="usage" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">0</Value>
-    </Setting>
     <Setting Name="blocked" Type="System.Int16" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
@@ -23,9 +20,6 @@
     <Setting Name="expiry" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="passkey" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="bssid" Type="System.String" Scope="User">
       <Value Profile="(Default)">NO FREE</Value>
     </Setting>
@@ -40,6 +34,12 @@
     </Setting>
     <Setting Name="secKeyCollection" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SettingsVersion" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0.0.0</Value>
+    </Setting>
+    <Setting Name="usage" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>
 </SettingsFile>

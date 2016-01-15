@@ -69,18 +69,6 @@ Namespace My
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
-        Public Property usage() As Integer
-            Get
-                Return CType(Me("usage"),Integer)
-            End Get
-            Set
-                Me("usage") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
         Public Property pending() As Integer
             Get
                 Return CType(Me("pending"),Integer)
@@ -125,6 +113,18 @@ Namespace My
                 Me("sKey") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+        Public Property st() As Integer
+            Get
+                Return CType(Me("st"),Integer)
+            End Get
+            Set
+                Me("st") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
@@ -136,9 +136,9 @@ Namespace My
     Friend Module MySettingsProperty
         
         <Global.System.ComponentModel.Design.HelpKeywordAttribute("My.Settings")>  _
-        Friend ReadOnly Property Settings() As Global.Quota.My.MySettings
+        Friend ReadOnly Property Settings() As Global.svq.My.MySettings
             Get
-                Return Global.Quota.My.MySettings.Default
+                Return Global.svq.My.MySettings.Default
             End Get
         End Property
     End Module

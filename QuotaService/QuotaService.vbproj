@@ -6,9 +6,9 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3400503C-2615-4CAD-9735-2F3ACF640131}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <StartupObject>Quota.QuotaService</StartupObject>
-    <RootNamespace>Quota</RootNamespace>
-    <AssemblyName>Quota</AssemblyName>
+    <StartupObject>svq.QuotaService</StartupObject>
+    <RootNamespace>svq</RootNamespace>
+    <AssemblyName>svq</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Console</MyType>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -20,7 +20,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Quota.xml</DocumentationFile>
+    <DocumentationFile>svq.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -30,7 +30,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Quota.xml</DocumentationFile>
+    <DocumentationFile>svq.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -45,29 +45,32 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Users\Lahiru\Documents\Visual Studio 2015\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SimpleWifi">
-      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\SimpleWifi.dll</HintPath>
+      <HintPath>C:\Users\Lahiru\Documents\Visual Studio 2015\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\SimpleWifi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Twitterizer2">
-      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Twitterizer2.dll</HintPath>
+      <HintPath>C:\Users\Lahiru\Documents\Visual Studio 2015\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Twitterizer2.dll</HintPath>
     </Reference>
     <Reference Include="Twitterizer2.Asynchronous">
-      <HintPath>D:\Projects\Visual Studio\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Twitterizer2.Asynchronous.dll</HintPath>
+      <HintPath>C:\Users\Lahiru\Documents\Visual Studio 2015\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Twitterizer2.Asynchronous.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +130,7 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
