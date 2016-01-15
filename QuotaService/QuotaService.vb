@@ -404,10 +404,11 @@ retry:
     End Sub
     Sub disconnectProcess()
         Try
-            irregularStop = True
-            Exit Sub
+            iface.Disconnect()
         Catch ex As Exception
             Log("error when disconnecting. " & ex.StackTrace & ex.Message)
+            irregularStop = True
+            Exit Sub
         End Try
     End Sub
     Protected Overrides Sub OnStop()
