@@ -651,6 +651,10 @@ Public Class Form1
     End Sub
     Private Sub updateCheckCompleted(ByVal sender As Object, ByVal e As System.Net.DownloadStringCompletedEventArgs)
         UpdateTxt = ""
+        If Not IsNothing(e.Error) Then
+            MsgBox(e.Error.Message, MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
         Dim text As String = e.Result
         text = e.Result
         Dim temp As String() = {"", ""}
@@ -658,7 +662,7 @@ Public Class Form1
         link = ""
         For Each s As String In text.Split(vbNewLine)
             temp = s.Split("#")
-            MsgBox(temp(0) & "  " & My.Application.Info.Version.ToString)
+            'MsgBox(temp(0) & "  " & My.Application.Info.Version.ToString)
             If New Version(temp(0)) > My.Application.Info.Version Then
                 link = temp(1)
                 found = True
