@@ -48,8 +48,6 @@ Public Class Form2
             Button1.Enabled = False
             AddHandler wc.DownloadStringCompleted, AddressOf OnChangeComplete
             Dim s As String = String.Format("{0}new/{1}/{2}/{3}", requestHandler, name, kbytes, Web.HttpUtility.UrlPathEncode(msg))
-            MsgBox(s)
-
             wc.DownloadStringAsync(New Uri(s))
             Return True
         Catch ex As Exception
