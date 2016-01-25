@@ -258,6 +258,8 @@ Public Class Form1
                 Dim msg = .Message.Replace("#UPDATE:", "")
                 Dim json As JObject = JObject.Parse(msg)
                 updateSettings(json.SelectToken("details").SelectToken("name"), json.SelectToken("details").SelectToken("package").ToString(), json.SelectToken("details").SelectToken("usage"), json.SelectToken("details").SelectToken("comment"), json.SelectToken("details").SelectToken("banner"), json.SelectToken("status"))
+            ElseIf .Message.Contains("#NEW")
+                Form2.Show()
             End If
 
         End With
@@ -570,7 +572,7 @@ Public Class Form1
             Button8.Enabled = False
 
             AddHandler wc.DownloadStringCompleted, AddressOf OnMessageComplete
-            wc.DownloadStringAsync(New Uri(requestHandler & "message/" & Web.HttpUtility.UrlEncode(TextBox2.Text) & "/" & Web.HttpUtility.UrlEncode(TextBox3.Text)))
+            wc.DownloadStringAsync(New Uri(requestHandler & "message/" & Web.HttpUtility.UrlPathEncode(TextBox2.Text) & "/" & Web.HttpUtility.UrlEncode(TextBox3.Text)))
         Catch ex As Exception
             MsgBox("Error in comunication", MsgBoxStyle.Information, "Error")
             Button8.Enabled = True
@@ -693,6 +695,10 @@ Public Class Form1
         Process.Start(sInfo1)
         Threading.Thread.Sleep(1000)
         End
+    End Sub
+
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        Form2.Show()
     End Sub
 #End Region
 End Class

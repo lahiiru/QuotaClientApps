@@ -28,7 +28,7 @@ Module Main
         End If
         'On Error GoTo e108
         mac = iface.NetworkInterface.GetPhysicalAddress.ToString()
-        requestHandler = requestHandler & "/user/" & My.Settings.bssid & "/" & mac & "/"
+        requestHandler = requestHandler & "/user/" & Web.HttpUtility.UrlPathEncode(My.Settings.bssid) & "/" & mac & "/"
         wc.Headers(HttpRequestHeader.UserAgent) = "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727)"
         wc.Proxy = Nothing
         Application.DoEvents()

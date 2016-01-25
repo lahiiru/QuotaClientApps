@@ -166,7 +166,7 @@ retry:
         'json.Property("pkey").Remove()
 
         If (json.SelectToken("status") = "NEW") Then
-            LogMsg("Welcome new user!")
+            LogMsg("#NEW:")
         ElseIf (json.SelectToken("status") = "OK") Then
             'LogMsg("User OK.") 'for debugging perpose
             Log("#UPDATE:" & json.ToString())
