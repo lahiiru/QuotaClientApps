@@ -44,6 +44,7 @@ Public Class Form2
         sendNewRequest(TextBox1.Text, TrackBar1.Value * 1000, TextBox3.Text)
     End Sub
     Function sendNewRequest(ByVal name, ByVal kbytes, ByVal msg) As Boolean
+
         Try
             Button1.Enabled = False
             AddHandler wc.DownloadStringCompleted, AddressOf OnChangeComplete
