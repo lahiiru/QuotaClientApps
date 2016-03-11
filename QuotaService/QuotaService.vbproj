@@ -84,6 +84,7 @@
       <HintPath>C:\Users\Lahiru\Documents\Visual Studio 2015\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\SimpleWifi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />

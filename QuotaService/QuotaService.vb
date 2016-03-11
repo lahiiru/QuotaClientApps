@@ -9,6 +9,7 @@ Imports System.ServiceProcess
 Imports Newtonsoft.Json.Linq
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Collections.Specialized
+Imports System.Configuration
 
 Public Class QuotaService
     Public client As SimpleWifi.Win32.WlanClient = New SimpleWifi.Win32.WlanClient
@@ -26,8 +27,10 @@ Public Class QuotaService
     Private lastUsage As Integer = 0
     Private usage As Integer = 0
     Private appPID As Integer = 0
+    Private initialUsage As Integer = 0 'correction for win7
     Dim keys As NameValueCollection()
     Protected Overrides Sub OnStart(ByVal args() As String)
+        handleUserConfigCorruption()
         'System.Diagnostics.Debugger.Launch()
         My.Settings.st = 0  'set successfully terminated to false
         My.Settings.Save()
@@ -73,6 +76,7 @@ retry:
         Thread.Sleep(500 / retries)
         If isConnectedTo() Then
             Log("#CONNECTED")
+            setInitialUsage()
             irregularStop = False
             usercheck()
         ElseIf retries > 1 Then
@@ -88,6 +92,20 @@ retry:
         'check()
         timer.Start()
 
+    End Sub
+    Sub handleUserConfigCorruption()
+        Dim isConfigurationValid As Boolean = False
+        While Not isConfigurationValid
+            Try
+                Dim appSettings As AppSettingsSection = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).AppSettings
+                isConfigurationValid = True
+            Catch e As ConfigurationErrorsException
+                If e.Filename.EndsWith("user.config") Then
+                    File.Delete(e.Filename)
+                End If
+                Log("User configurations were deleted due to corruption.")
+            End Try
+        End While
     End Sub
     Sub validateApp()
         Try
@@ -204,6 +222,10 @@ retry:
     Sub LogMsg(ByVal body As String, Optional ByVal type As MsgBoxStyle = MsgBoxStyle.Information, Optional ByVal title As String = "Quota service says")
         Log(String.Format("#MSG:{0}:{1}:{2}", body.Replace(":", "-"), Integer.Parse(type), title.Replace(":", "-")))
     End Sub
+    Sub setInitialUsage()
+        Dim kbytes As Integer = (iface.NetworkInterface.GetIPv4Statistics.BytesReceived + iface.NetworkInterface.GetIPv4Statistics.BytesSent) / 1024
+        initialUsage = kbytes
+    End Sub
     Sub prepareUsage()
         If Not iface.CurrentConnection.profileName.ToUpper.Equals(ssid.ToUpper()) Then
             usage = 0
@@ -212,6 +234,8 @@ retry:
         End If
 
         Dim kbytes As Integer = (iface.NetworkInterface.GetIPv4Statistics.BytesReceived + iface.NetworkInterface.GetIPv4Statistics.BytesSent) / 1024
+        kbytes = kbytes - initialUsage
+
         If usage < kbytes Then
             usage = kbytes
         End If

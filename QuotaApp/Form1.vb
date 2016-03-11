@@ -6,6 +6,7 @@ Imports Twitterizer
 Imports Newtonsoft.Json.Linq
 Imports System.Web
 Imports System.IO
+Imports System.Configuration
 
 Public Class Form1
 
@@ -20,8 +21,23 @@ Public Class Form1
         CONNECT_NORMAL
         CONNECT_CUSTOM
     End Enum
-
+    Sub handleUserConfigCorruption()
+        Dim isConfigurationValid As Boolean = False
+        While Not isConfigurationValid
+            Try
+                Dim appSettings As AppSettingsSection = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).AppSettings
+                isConfigurationValid = True
+            Catch e As ConfigurationErrorsException
+                If e.Filename.EndsWith("user.config") Then
+                    File.Delete(e.Filename)
+                End If
+                MsgBox("User configurations were deleted due to corruption.", MsgBoxStyle.Exclamation, "Warning")
+            End Try
+        End While
+    End Sub
     Sub loadForm()
+
+        handleUserConfigCorruption()
         If My.Settings.ssidCollection Is Nothing Then
             My.Settings.ssidCollection = New Specialized.StringCollection
         End If
@@ -469,6 +485,7 @@ Public Class Form1
             .Verb = "runas"                             'run as admin
         End With
         MsgBox("Please press Yes when system ask permissions", MsgBoxStyle.Information, "Quota")
+        On Error Resume Next  'handles error when user cancels confirmation
         procExecuting = Process.Start(procStartInfo)
     End Sub
 
@@ -476,7 +493,7 @@ Public Class Form1
         installService()
     End Sub
     Sub installService()
-        runner("cmd.exe", "/c @echo off && cd /d """ & Application.StartupPath & """ && title ""Quota | Installer"" && color f1 && cls && mode con: cols=46 lines=38 && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Please wait this will take few seconds... && timeout 3 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Uninstalling service... && timeout 2 > NUL && InstallUtil.exe /u svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Installing service... && timeout 2 > NUL && InstallUtil.exe /i svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Granting permissions... && timeout 2 > NUL && sc sdset quota2 D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;IU)(A;;CCLCSWLOCRRC;;;SU)(A;;CCDCLCSWRPWPDTLOCRSDRC;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD) && timeout 2 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Setup finished... && timeout 2 > NUL")
+        runner("cmd.exe", "/c @echo off && cd /d """ & Application.StartupPath & """ && title ""Quota | Installer"" && color f1 && cls && mode con: cols=46 lines=38 && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Please wait this will take few seconds... && timeout 3 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Uninstalling service... && timeout 2 > NUL && InstallUtil.exe /u svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Installing service... && timeout 2 > NUL && InstallUtil.exe /i svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Granting permissions... && timeout 2 > NUL && sc sdset quota2 D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;IU)(A;;CCLCSWLOCRRC;;;SU)(A;;CCDCLCSWRPWPDTLOCRSDRC;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD) & timeout 2 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Adding firewall exception... && timeout 2 > NUL && netsh firewall add allowedprogram """ & Application.StartupPath & "\svq.exe" & """ ""Quota Service"" ENABLE & timeout 10 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Setup finished... && timeout 2 > NUL")
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
