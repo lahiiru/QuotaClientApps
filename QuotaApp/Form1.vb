@@ -21,6 +21,7 @@ Public Class Form1
         CONNECT_NORMAL
         CONNECT_CUSTOM
     End Enum
+
     Sub handleUserConfigCorruption()
         Dim isConfigurationValid As Boolean = False
         While Not isConfigurationValid
@@ -153,7 +154,7 @@ Public Class Form1
     End Sub
     Sub stopService()
         ServiceController1.Refresh()
-        If ServiceController1.Status = ServiceControllerStatus.Running Or ServiceController1.Status = ServiceControllerStatus.StartPending Then
+        If ServiceController1.Status = ServiceControllerStatus.Running Then
             Try
                 ServiceController1.Stop()
             Catch ex As Exception
@@ -284,7 +285,7 @@ Public Class Form1
             ElseIf .Message.Contains("#UPDATE:") Then
                 Dim msg = .Message.Replace("#UPDATE:", "")
                 Dim json As JObject = JObject.Parse(msg)
-                updateSettings(json.SelectToken("details").SelectToken("name"), json.SelectToken("details").SelectToken("package").ToString(), json.SelectToken("details").SelectToken("usage"), json.SelectToken("details").SelectToken("comment"), json.SelectToken("details").SelectToken("banner"), json.SelectToken("status"))
+                updateSettings(json.SelectToken("details").SelectToken("name"), json.SelectToken("details").SelectToken("package").ToString(), json.SelectToken("details").SelectToken("usage"), json.SelectToken("details").SelectToken("comment"), json.SelectToken("details").SelectToken("banner"), json.SelectToken("status"), json.SelectToken("details").SelectToken("datetime"), json.SelectToken("details").SelectToken("utname"))
             ElseIf .Message.Contains("#NEW:")
                 Dim msg = .Message.Replace("#NEW:", "")
                 Dim json As JObject = JObject.Parse(msg)
@@ -296,12 +297,14 @@ Public Class Form1
 
 
     End Sub
-    Sub updateSettings(ByVal name As String, ByVal package As String, ByVal usage As String, ByVal comment As String, ByVal banner As String, ByVal status As String)
+    Sub updateSettings(ByVal name As String, ByVal package As String, ByVal usage As String, ByVal comment As String, ByVal banner As String, ByVal status As String, ByVal dt As String, ByVal usage_name As String)
         My.Settings.name = name
         My.Settings.fullquota = package
         My.Settings.usage = Integer.Parse(usage)
         My.Settings.quota = Integer.Parse(package) - Integer.Parse(usage)
         My.Settings.comment = comment
+        timestamp = dt
+        utname = usage_name
         If status.Contains("BLOCKED") Then
             My.Settings.blocked = 1
         Else
@@ -309,11 +312,27 @@ Public Class Form1
         End If
         My.Settings.Save()
     End Sub
+    Private Sub updateTime()
+        ' force to reconnect by disconnecting when user is continuely surfing through 8.00 am
+        If timestamp.Contains(" 08:01:00") And Not recentlyUploaded Then
+            recentlyUploaded = True
+            stopService()
+        Else
+            recentlyUploaded = False
+        End If
+        Dim dates As String() = timestamp.Split(" ")(0).Split("-")
+        Dim times As String() = timestamp.Split(" ")(1).Split(":")
+        Dim dt As DateTime = New DateTime(Integer.Parse(dates(0)), Integer.Parse(dates(1)), Integer.Parse(dates(2)), Integer.Parse(times(0)), Integer.Parse(times(1)), Integer.Parse(times(2)))
+        dt = dt.AddSeconds(1)
+        timestamp = dt.ToString("yyyy-MM-dd HH:mm:ss")
+    End Sub
     Sub updateUI()
+        updateTime()
+        lblTimeStamp.Text = timestamp
         lblRemaining.Text = (My.Settings.quota / 1000.0).ToString("N2") & " MB"
         lblUsed.Text = (My.Settings.usage / 1000000.0).ToString("N2") & " GB"
         lblComment.Text = My.Settings.comment.Replace("<br>", vbNewLine)
-        lblPackage.Text = (My.Settings.fullquota / 1000000.0).ToString("N2") & " GB"
+        lblPackage.Text = (My.Settings.fullquota / 1000000.0).ToString("N2") & " GB (" & utname & ")"
         Label4.Text = (My.Settings.fullquota / 1000000.0).ToString("N2") & " GB"
         Label24.Text = (My.Settings.fullquota / 1000000.0).ToString("N2") & " GB"
         lblExpiredOn.Text = "N/A"

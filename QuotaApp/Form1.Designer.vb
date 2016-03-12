@@ -108,6 +108,7 @@ Partial Class Form1
         Me.Timer2 = New System.Windows.Forms.Timer(Me.components)
         Me.WebBrowser1 = New System.Windows.Forms.WebBrowser()
         Me.Button7 = New System.Windows.Forms.Button()
+        Me.lblTimeStamp = New System.Windows.Forms.Label()
         CType(Me.EventLog1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
         Me.tabControl.SuspendLayout()
@@ -257,6 +258,7 @@ Partial Class Form1
         '
         Me.Panel1.BackColor = System.Drawing.Color.White
         Me.Panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.Panel1.Controls.Add(Me.lblTimeStamp)
         Me.Panel1.Controls.Add(Me.lblUsed)
         Me.Panel1.Controls.Add(Me.Label2)
         Me.Panel1.Controls.Add(Me.lblBlackListed)
@@ -270,13 +272,13 @@ Partial Class Form1
         Me.Panel1.Controls.Add(Me.Label8)
         Me.Panel1.Location = New System.Drawing.Point(20, 52)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(230, 198)
+        Me.Panel1.Size = New System.Drawing.Size(230, 200)
         Me.Panel1.TabIndex = 36
         '
         'lblUsed
         '
         Me.lblUsed.ForeColor = System.Drawing.Color.Black
-        Me.lblUsed.Location = New System.Drawing.Point(87, 79)
+        Me.lblUsed.Location = New System.Drawing.Point(87, 96)
         Me.lblUsed.Name = "lblUsed"
         Me.lblUsed.Size = New System.Drawing.Size(66, 13)
         Me.lblUsed.TabIndex = 37
@@ -285,7 +287,7 @@ Partial Class Form1
         'Label2
         '
         Me.Label2.ForeColor = System.Drawing.Color.Black
-        Me.Label2.Location = New System.Drawing.Point(15, 79)
+        Me.Label2.Location = New System.Drawing.Point(15, 96)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(66, 13)
         Me.Label2.TabIndex = 36
@@ -295,7 +297,7 @@ Partial Class Form1
         '
         Me.lblBlackListed.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.lblBlackListed.ForeColor = System.Drawing.Color.Black
-        Me.lblBlackListed.Location = New System.Drawing.Point(87, 157)
+        Me.lblBlackListed.Location = New System.Drawing.Point(87, 174)
         Me.lblBlackListed.Name = "lblBlackListed"
         Me.lblBlackListed.Size = New System.Drawing.Size(100, 13)
         Me.lblBlackListed.TabIndex = 11
@@ -304,7 +306,7 @@ Partial Class Form1
         'ProgressBar1
         '
         Me.ProgressBar1.ForeColor = System.Drawing.Color.Green
-        Me.ProgressBar1.Location = New System.Drawing.Point(18, 18)
+        Me.ProgressBar1.Location = New System.Drawing.Point(18, 35)
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(193, 22)
         Me.ProgressBar1.Step = 1
@@ -314,7 +316,7 @@ Partial Class Form1
         'Label6
         '
         Me.Label6.ForeColor = System.Drawing.Color.Black
-        Me.Label6.Location = New System.Drawing.Point(15, 105)
+        Me.Label6.Location = New System.Drawing.Point(15, 122)
         Me.Label6.Name = "Label6"
         Me.Label6.Size = New System.Drawing.Size(66, 13)
         Me.Label6.TabIndex = 10
@@ -324,7 +326,7 @@ Partial Class Form1
         '
         Me.lblRemaining.AutoSize = True
         Me.lblRemaining.ForeColor = System.Drawing.Color.Black
-        Me.lblRemaining.Location = New System.Drawing.Point(87, 105)
+        Me.lblRemaining.Location = New System.Drawing.Point(87, 122)
         Me.lblRemaining.Name = "lblRemaining"
         Me.lblRemaining.Size = New System.Drawing.Size(13, 13)
         Me.lblRemaining.TabIndex = 8
@@ -333,7 +335,7 @@ Partial Class Form1
         'Label10
         '
         Me.Label10.ForeColor = System.Drawing.Color.Black
-        Me.Label10.Location = New System.Drawing.Point(15, 157)
+        Me.Label10.Location = New System.Drawing.Point(15, 174)
         Me.Label10.Name = "Label10"
         Me.Label10.Size = New System.Drawing.Size(66, 13)
         Me.Label10.TabIndex = 13
@@ -342,7 +344,7 @@ Partial Class Form1
         'Label5
         '
         Me.Label5.ForeColor = System.Drawing.Color.Black
-        Me.Label5.Location = New System.Drawing.Point(15, 53)
+        Me.Label5.Location = New System.Drawing.Point(15, 70)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(66, 13)
         Me.Label5.TabIndex = 15
@@ -351,7 +353,7 @@ Partial Class Form1
         'lblExpiredOn
         '
         Me.lblExpiredOn.ForeColor = System.Drawing.Color.Black
-        Me.lblExpiredOn.Location = New System.Drawing.Point(87, 131)
+        Me.lblExpiredOn.Location = New System.Drawing.Point(87, 148)
         Me.lblExpiredOn.Name = "lblExpiredOn"
         Me.lblExpiredOn.Size = New System.Drawing.Size(87, 13)
         Me.lblExpiredOn.TabIndex = 12
@@ -360,16 +362,16 @@ Partial Class Form1
         'lblPackage
         '
         Me.lblPackage.ForeColor = System.Drawing.Color.Black
-        Me.lblPackage.Location = New System.Drawing.Point(87, 53)
+        Me.lblPackage.Location = New System.Drawing.Point(87, 70)
         Me.lblPackage.Name = "lblPackage"
-        Me.lblPackage.Size = New System.Drawing.Size(100, 13)
+        Me.lblPackage.Size = New System.Drawing.Size(138, 13)
         Me.lblPackage.TabIndex = 16
         Me.lblPackage.Text = "0"
         '
         'Label8
         '
         Me.Label8.ForeColor = System.Drawing.Color.Black
-        Me.Label8.Location = New System.Drawing.Point(15, 131)
+        Me.Label8.Location = New System.Drawing.Point(15, 148)
         Me.Label8.Name = "Label8"
         Me.Label8.Size = New System.Drawing.Size(66, 13)
         Me.Label8.TabIndex = 14
@@ -867,6 +869,7 @@ Partial Class Form1
         'Button1
         '
         Me.Button1.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
+        Me.Button1.Enabled = False
         Me.Button1.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Yellow
         Me.Button1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
@@ -1033,6 +1036,14 @@ Partial Class Form1
         Me.Button7.TabIndex = 25
         Me.Button7.UseVisualStyleBackColor = False
         '
+        'lblTimeStamp
+        '
+        Me.lblTimeStamp.ForeColor = System.Drawing.Color.Black
+        Me.lblTimeStamp.Location = New System.Drawing.Point(15, 12)
+        Me.lblTimeStamp.Name = "lblTimeStamp"
+        Me.lblTimeStamp.Size = New System.Drawing.Size(196, 20)
+        Me.lblTimeStamp.TabIndex = 39
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1174,4 +1185,5 @@ Partial Class Form1
     Friend WithEvents Label26 As Label
     Friend WithEvents ToolStripStatusLabel5 As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabel6 As ToolStripStatusLabel
+    Friend WithEvents lblTimeStamp As Label
 End Class

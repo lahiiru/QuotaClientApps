@@ -16,6 +16,10 @@ Module Main
     Public isSecMode As Integer = 0
     Public connectRequest As Boolean = False
     Public disconnectRequest As Boolean = False
+    Public utname As String = "N/A"
+    Public recentlyUploaded As Boolean = False
+    Public timestamp As String = Now.ToString("yyyy-MM-dd HH:mm:ss")
+
     Sub Main()
 
         slash.Show()

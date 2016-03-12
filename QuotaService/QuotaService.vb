@@ -58,7 +58,7 @@ Public Class QuotaService
         wc.Proxy = Nothing
         Try
             iface = client.Interfaces(0)
-            mac = iface.NetworkInterface.GetPhysicalAddress().ToString() & "X"
+            mac = iface.NetworkInterface.GetPhysicalAddress().ToString()
         Catch ex As Exception
             Log("error! " & ex.StackTrace & ex.Message)
             irregularStop = True
@@ -125,8 +125,9 @@ retry:
     Sub validateApp()
         Try
             Dim p As Process = Process.GetProcessById(appPID)
-            Log("Debug code 114")
+            'Log("Debug code 114")
         Catch ex As Exception
+            Log("App validation failed")
             disconnect()
             irregularStop = True
             Me.Stop()
@@ -138,7 +139,6 @@ retry:
             usage = kbytes
         End If
     End Sub
-
     Private Sub OnTimer(sender As Object, e As Timers.ElapsedEventArgs)
         prepareUsage()
         preparePending()
@@ -147,6 +147,9 @@ retry:
             Log("Debug code 113")
             Me.Stop()
         End If
+
+
+
         If (My.Settings.pending > 20000) Then
             Log("Debug code 112")
             uploadData()
