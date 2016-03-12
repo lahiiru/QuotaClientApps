@@ -3,7 +3,9 @@ Imports System.Text.RegularExpressions
 
 Public Class Form2
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        If maxPackage >= TrackBar1.Minimum * 100000 Then
+            TrackBar1.Maximum = maxPackage / 100000.0
+        End If
     End Sub
 
     Private Sub TrackBar1_Scroll(sender As Object, e As EventArgs) Handles TrackBar1.Scroll
@@ -41,7 +43,11 @@ Public Class Form2
             MsgBox("Invalid name or package size", MsgBoxStyle.Exclamation, "Invalid")
             Exit Sub
         End If
-        sendNewRequest(TextBox1.Text, TrackBar1.Value * 1000, TextBox3.Text)
+        isSecMode = 1 'connect for 2 seconds
+        connectRequest = True
+        Threading.Thread.Sleep(1000)
+        isSecMode = 0
+        sendNewRequest(TextBox1.Text, TrackBar1.Value * 100000, TextBox3.Text)
     End Sub
     Function sendNewRequest(ByVal name, ByVal kbytes, ByVal msg) As Boolean
 
@@ -59,6 +65,8 @@ Public Class Form2
     End Function
 
     Private Sub OnChangeComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
+        disconnectRequest = True  'disconnect
+
         If Button1.Enabled Then
             Exit Sub
         End If
@@ -66,6 +74,7 @@ Public Class Form2
         If Not e.Cancelled AndAlso e.Error Is Nothing Then
             If e.Result.Equals("OK") Then
                 MsgBox("Your registration request is sent for approval.", MsgBoxStyle.Information, "Success")
+                Application.ExitThread()
             Else
                 MsgBox("Couldn't process your request", MsgBoxStyle.Exclamation, "Error")
             End If

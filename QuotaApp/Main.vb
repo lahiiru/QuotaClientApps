@@ -12,7 +12,10 @@ Module Main
     Public myLog As New EventLog()
     Public mainForm As New Form1
     Public slash As New SplashScreen1
-
+    Public maxPackage As Integer = 25000000 'max package a new user can request
+    Public isSecMode As Integer = 0
+    Public connectRequest As Boolean = False
+    Public disconnectRequest As Boolean = False
     Sub Main()
 
         slash.Show()

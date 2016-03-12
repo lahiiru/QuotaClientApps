@@ -96,6 +96,7 @@ Partial Class Form2
         Me.TextBox3.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
         Me.TextBox3.Size = New System.Drawing.Size(385, 72)
         Me.TextBox3.TabIndex = 3
+        Me.TextBox3.Text = "Please register me on the network."
         '
         'TrackBar1
         '

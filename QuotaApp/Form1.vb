@@ -53,12 +53,22 @@ Public Class Form1
         Process.Start(sInfo)
     End Sub
     Dim flag As Boolean = True
-    Private UpdateTxt As String = ""
-    Private link As String = ""
+    Public UpdateTxt As String = ""
+    Public link As String = ""
     Public Property progress As Integer
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         Try
+            'cross thread stoppig and starting support
+            If connectRequest Then
+                connectRequest = False
+                serviceHandler()
+            End If
+            If disconnectRequest Then
+                disconnectRequest = False
+                stopService()
+            End If
+
             ServiceController1.Refresh()
             Select Case ServiceController1.Status
                 Case ServiceControllerStatus.StartPending
@@ -136,30 +146,32 @@ Public Class Form1
 
         'if button caption is DISCONNECT
         If Button2.Text.ToUpper() = "DISCONNECT" Then
-            ServiceController1.Refresh()
-            If ServiceController1.Status = ServiceControllerStatus.Running Then
-                Try
-                    ServiceController1.Stop()
-                Catch ex As Exception
-                    If ex.Message.Contains("service on") Then
-                        Dim process As Process
-                        Dim processStartInfo As ProcessStartInfo
-                        processStartInfo = New ProcessStartInfo
-                        processStartInfo.FileName = "taskkill.exe"
-                        processStartInfo.Arguments = "/f /im svq.exe"
-                        processStartInfo.Verb = "runas"
-                        processStartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
-                        processStartInfo.UseShellExecute = True
-                        process = Process.Start(processStartInfo)
-                    End If
-                End Try
-
-            End If
+            stopService()
         End If
 
 
     End Sub
+    Sub stopService()
+        ServiceController1.Refresh()
+        If ServiceController1.Status = ServiceControllerStatus.Running Or ServiceController1.Status = ServiceControllerStatus.StartPending Then
+            Try
+                ServiceController1.Stop()
+            Catch ex As Exception
+                If ex.Message.Contains("service on") Then
+                    Dim process As Process
+                    Dim processStartInfo As ProcessStartInfo
+                    processStartInfo = New ProcessStartInfo
+                    processStartInfo.FileName = "taskkill.exe"
+                    processStartInfo.Arguments = "/f /im svq.exe"
+                    processStartInfo.Verb = "runas"
+                    processStartInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                    processStartInfo.UseShellExecute = True
+                    process = Process.Start(processStartInfo)
+                End If
+            End Try
 
+        End If
+    End Sub
     'handle the service while connecting -- send passwords to service and try to connect
     Sub serviceHandler()
         If My.Settings.ssidCollection Is Nothing Then
@@ -177,8 +189,7 @@ Public Class Form1
             connect_using = ConnectState.CONNECT_NORMAL 'handles user input key errors
         Else
             Dim pid As Integer = Process.GetCurrentProcess().Id
-
-            startService(curr_ssid, pid, curr_passKey) 'args- (SSID,keyIndex,[Cumstom passkey])
+            startService(curr_ssid, pid, isSecMode, curr_passKey) 'args- (SSID,pid,secMode,[Cumstom passkey])
         End If
     End Sub
 
@@ -201,7 +212,7 @@ Public Class Form1
         Return passKey
     End Function
 
-    Sub startService(ByVal ssid As String, ByVal keyIndex As Integer, Optional ByVal customKey As String = "")
+    Sub startService(ByVal ssid As String, ByVal keyIndex As Integer, ByVal isSecMode As Integer, Optional ByVal customKey As String = "")
         Try
             ServiceController1.ServiceName = "Quota2"
             Try
@@ -219,7 +230,7 @@ Public Class Form1
 
                 'if the service is stopped then only try to start the service
                 If (ServiceController1.Status = ServiceControllerStatus.Stopped) Then
-                    ServiceController1.Start({ssid, keyIndex, customKey})
+                    ServiceController1.Start({ssid, keyIndex, isSecMode, customKey})
                 End If
             Else
                 ServiceController1.Stop()
@@ -274,8 +285,11 @@ Public Class Form1
                 Dim msg = .Message.Replace("#UPDATE:", "")
                 Dim json As JObject = JObject.Parse(msg)
                 updateSettings(json.SelectToken("details").SelectToken("name"), json.SelectToken("details").SelectToken("package").ToString(), json.SelectToken("details").SelectToken("usage"), json.SelectToken("details").SelectToken("comment"), json.SelectToken("details").SelectToken("banner"), json.SelectToken("status"))
-            ElseIf .Message.Contains("#NEW")
-                Form2.Show()
+            ElseIf .Message.Contains("#NEW:")
+                Dim msg = .Message.Replace("#NEW:", "")
+                Dim json As JObject = JObject.Parse(msg)
+                maxPackage = Integer.Parse(json.SelectToken("details").ToString())
+                Application.Run(Form2)
             End If
 
         End With

@@ -28,6 +28,7 @@ Public Class QuotaService
     Private usage As Integer = 0
     Private appPID As Integer = 0
     Private initialUsage As Integer = 0 'correction for win7
+    Private isSecMode As Integer = 0 'second mode
     Dim keys As NameValueCollection()
     Protected Overrides Sub OnStart(ByVal args() As String)
         handleUserConfigCorruption()
@@ -37,8 +38,8 @@ Public Class QuotaService
 
         ssid = args(0)
         appPID = args(1)
-        customKey = args(2)
-
+        isSecMode = args(2)
+        customKey = args(3)
 
 
         'create custom log called Quatalog
@@ -57,7 +58,7 @@ Public Class QuotaService
         wc.Proxy = Nothing
         Try
             iface = client.Interfaces(0)
-            mac = iface.NetworkInterface.GetPhysicalAddress().ToString()
+            mac = iface.NetworkInterface.GetPhysicalAddress().ToString() & "X"
         Catch ex As Exception
             Log("error! " & ex.StackTrace & ex.Message)
             irregularStop = True
@@ -78,6 +79,12 @@ retry:
             Log("#CONNECTED")
             setInitialUsage()
             irregularStop = False
+            If isSecMode > 0 Then
+                processSecMode()
+                Log("#SEC_MODE_OVER")
+                irregularStop = True
+                Me.Stop()
+            End If
             usercheck()
         ElseIf retries > 1 Then
             retries = retries - 1
@@ -92,6 +99,14 @@ retry:
         'check()
         timer.Start()
 
+    End Sub
+    Sub processSecMode()
+        Dim i As Integer = isSecMode
+
+        For sec As Integer = 0 To i
+            Thread.Sleep(1000)
+            Log("#SEC_MODE_COUNTING " & sec)
+        Next
     End Sub
     Sub handleUserConfigCorruption()
         Dim isConfigurationValid As Boolean = False
@@ -160,6 +175,13 @@ retry:
         Log("Response: " & response)
         Dim json As JObject = JObject.Parse(response)
 
+        'if new user do nothing
+        If (json.SelectToken("status") = "NEW") Then
+            Log("#NEW:" & json.ToString())
+            irregularStop = True
+            Me.Stop()
+        End If
+
         'saving recieved keys
         Dim pkeys As NameValueCollection
         Dim skeys As NameValueCollection
@@ -183,9 +205,8 @@ retry:
         'json.Property("skey").Remove()
         'json.Property("pkey").Remove()
 
-        If (json.SelectToken("status") = "NEW") Then
-            LogMsg("#NEW:")
-        ElseIf (json.SelectToken("status") = "OK") Then
+
+        If (json.SelectToken("status") = "OK") Then
             'LogMsg("User OK.") 'for debugging perpose
             Log("#UPDATE:" & json.ToString())
         ElseIf (json.SelectToken("status") = "BLOCKED") Then
@@ -331,6 +352,7 @@ retry:
         'if keys is nothing it will be the app installed time or settings corrupted
         If IsNothing(keys) Then
             Log("Debug code 101")
+            connectProcess(Encode(ssid)) 'added later
             Exit Sub
         End If
 
