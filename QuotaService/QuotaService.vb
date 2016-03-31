@@ -15,7 +15,7 @@ Public Class QuotaService
     Public client As SimpleWifi.Win32.WlanClient = New SimpleWifi.Win32.WlanClient
     Public iface As SimpleWifi.Win32.WlanInterface
     Public wc As WebClient = New WebClient
-    Public requestHandler As String = "http://edu.wearetrying.info/quota2/web/app.php/request/user/"
+    Public requestHandler As String = "http://52.24.88.15/quota2/web/app.php/request/user/"
     Public mac As String = ""
     Public myLog As New EventLog()
     ' Set up a timer to trigger every minute.

@@ -15,6 +15,7 @@ Public Class Form1
     Private active_color As Color = Color.FromArgb(219, 219, 219)
     'connection state variable
     Public connect_using As ConnectState = ConnectState.CONNECT_NORMAL
+    Public autoApplyUpdates As Boolean = False
     'connection method states
     Enum ConnectState
         CONNECT_DEFAULT
@@ -246,6 +247,10 @@ Public Class Form1
         Dim json As JObject = JObject.Parse("{'status':'OK','details':{'name':'Lahiru Slave','package':5000000,'usage':'332345'}}")
         MsgBox(json.SelectToken("details").SelectToken("name"))
     End Sub
+    Sub checkAndUpdate()
+        Button10_Click()
+        autoApplyUpdates = True
+    End Sub
     Public Sub processLog(ByVal [source] As Object, ByVal e As EntryWrittenEventArgs)
         With e.Entry
             'MsgBox("Service said: " & vbNewLine & .Message, MsgBoxStyle.Information)
@@ -257,8 +262,9 @@ Public Class Form1
                     'MsgBox("you are connectd using default key")
                     My.Settings.ssidCollection.Add(curr_ssid)
                 End If
-                updateAdvert()
                 My.Settings.Save()
+                checkAndUpdate()
+                updateAdvert()
             End If
 
             If .Message.Contains("#NOTCONNECTED") Then
@@ -526,7 +532,7 @@ Public Class Form1
         installService()
     End Sub
     Sub installService()
-        runner("cmd.exe", "/c @echo off && cd /d """ & Application.StartupPath & """ && title ""Quota | Installer"" && color f1 && cls && mode con: cols=46 lines=38 && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Please wait this will take few seconds... && timeout 3 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Uninstalling service... && timeout 2 > NUL && InstallUtil.exe /u svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Installing service... && timeout 2 > NUL && InstallUtil.exe /i svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Granting permissions... && timeout 2 > NUL && sc sdset quota2 D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;IU)(A;;CCLCSWLOCRRC;;;SU)(A;;CCDCLCSWRPWPDTLOCRSDRC;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD) & timeout 2 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Adding firewall exception... && timeout 2 > NUL && netsh firewall add allowedprogram """ & Application.StartupPath & "\svq.exe" & """ ""Quota Service"" ENABLE & timeout 10 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Setup finished... && timeout 2 > NUL")
+        runner("cmd.exe", "/c @echo off && cd /d """ & Application.StartupPath & """ && title ""Quota | Installer"" && color f1 && cls && mode con: cols=46 lines=38 && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Please wait this will take few seconds... && timeout 3 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Uninstalling service... && timeout 2 > NUL && InstallUtil.exe /u svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Installing service... && timeout 2 > NUL && InstallUtil.exe /i svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Granting permissions... && timeout 2 > NUL && sc sdset quota2 D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;IU)(A;;CCLCSWLOCRRC;;;SU)(A;;CCDCLCSWRPWPDTLOCRSDRC;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD) & timeout 2 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Adding firewall exception... && timeout 2 > NUL && netsh firewall add allowedprogram """ & Application.StartupPath & "\svq.exe" & """ ""Quota Service"" ENABLE & timeout 3 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Setup finished... && timeout 2 > NUL")
     End Sub
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -550,6 +556,14 @@ Public Class Form1
 
     Private Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
         updateUI()
+
+        If autoApplyUpdates Then
+            If Button10.Text.ToLower.Contains("now") Then
+                Button10_Click()
+                autoApplyUpdates = False
+            End If
+        End If
+
     End Sub
 
     Private Sub Button6_Click_1(sender As Object, e As EventArgs)
@@ -653,7 +667,7 @@ Public Class Form1
         Dim gen As System.Random = New System.Random()
         Return gen.Next(min, max)
     End Function
-    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
+    Private Sub Button10_Click() Handles Button10.Click
         If Button10.Text = "Check for updates" Then
             Dim worker As New System.ComponentModel.BackgroundWorker
             AddHandler worker.DoWork, AddressOf startCheck
@@ -702,6 +716,7 @@ Public Class Form1
         progress = e.ProgressPercentage
     End Sub
     Private Sub updateCheckCompleted(ByVal sender As Object, ByVal e As System.Net.DownloadStringCompletedEventArgs)
+        On Error Resume Next
         UpdateTxt = ""
         If Not IsNothing(e.Error) Then
             MsgBox(e.Error.Message, MsgBoxStyle.Exclamation)
@@ -722,7 +737,11 @@ Public Class Form1
             End If
         Next
         If Not found Then
-            MsgBox("No updates found. You have the latest version.", MsgBoxStyle.Information)
+            If autoApplyUpdates Then
+                autoApplyUpdates = False
+            Else
+                MsgBox("No updates found. You have the latest version.", MsgBoxStyle.Information)
+            End If
         End If
     End Sub
     Private Sub updateCompleted()
@@ -745,10 +764,6 @@ Public Class Form1
         Process.Start(sInfo1)
         Threading.Thread.Sleep(1000)
         End
-    End Sub
-
-    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
-
     End Sub
 #End Region
 End Class

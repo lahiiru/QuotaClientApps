@@ -3,7 +3,7 @@ Imports SimpleWifi.Win32
 
 Module Main
     Public iface As SimpleWifi.Win32.WlanInterface = Nothing
-    Public requestHandler As String = "http://edu.wearetrying.info/quota2/web/app.php/request"
+    Public requestHandler As String = "http://52.24.88.15/quota2/web/app.php/request"
     Public mac As String = ""
     Public wc As WebClient = New WebClient
     Public client As WlanClient = New WlanClient()
