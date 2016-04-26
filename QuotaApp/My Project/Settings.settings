@@ -18,7 +18,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="expiry" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">N/A</Value>
     </Setting>
     <Setting Name="bssid" Type="System.String" Scope="User">
       <Value Profile="(Default)">NO FREE</Value>

@@ -31,6 +31,7 @@ Partial Class Form1
         Me.ToolStripStatusLabel3 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabel2 = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.ToolStripStatusLabel4 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabel5 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ToolStripStatusLabel6 = New System.Windows.Forms.ToolStripStatusLabel()
         Me.ServiceController1 = New System.ServiceProcess.ServiceController()
@@ -40,6 +41,7 @@ Partial Class Form1
         Me.Label13 = New System.Windows.Forms.Label()
         Me.Label12 = New System.Windows.Forms.Label()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.lblTimeStamp = New System.Windows.Forms.Label()
         Me.lblUsed = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.lblBlackListed = New System.Windows.Forms.Label()
@@ -108,7 +110,6 @@ Partial Class Form1
         Me.Timer2 = New System.Windows.Forms.Timer(Me.components)
         Me.WebBrowser1 = New System.Windows.Forms.WebBrowser()
         Me.Button7 = New System.Windows.Forms.Button()
-        Me.lblTimeStamp = New System.Windows.Forms.Label()
         CType(Me.EventLog1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
         Me.tabControl.SuspendLayout()
@@ -153,7 +154,7 @@ Partial Class Form1
         'StatusStrip1
         '
         Me.StatusStrip1.BackColor = System.Drawing.SystemColors.ButtonFace
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel3, Me.ToolStripStatusLabel1, Me.ToolStripStatusLabel2, Me.ToolStripStatusLabel5, Me.ToolStripStatusLabel6})
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel3, Me.ToolStripStatusLabel1, Me.ToolStripStatusLabel2, Me.ToolStripStatusLabel4, Me.ToolStripStatusLabel5, Me.ToolStripStatusLabel6})
         Me.StatusStrip1.Location = New System.Drawing.Point(0, 430)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Size = New System.Drawing.Size(716, 22)
@@ -177,6 +178,12 @@ Partial Class Form1
         Me.ToolStripStatusLabel2.Name = "ToolStripStatusLabel2"
         Me.ToolStripStatusLabel2.Size = New System.Drawing.Size(45, 17)
         Me.ToolStripStatusLabel2.Text = "^ 0 Mb"
+        '
+        'ToolStripStatusLabel4
+        '
+        Me.ToolStripStatusLabel4.Name = "ToolStripStatusLabel4"
+        Me.ToolStripStatusLabel4.Size = New System.Drawing.Size(42, 17)
+        Me.ToolStripStatusLabel4.Text = "0 Kbps"
         '
         'ToolStripStatusLabel5
         '
@@ -274,6 +281,14 @@ Partial Class Form1
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(230, 200)
         Me.Panel1.TabIndex = 36
+        '
+        'lblTimeStamp
+        '
+        Me.lblTimeStamp.ForeColor = System.Drawing.Color.Black
+        Me.lblTimeStamp.Location = New System.Drawing.Point(15, 12)
+        Me.lblTimeStamp.Name = "lblTimeStamp"
+        Me.lblTimeStamp.Size = New System.Drawing.Size(196, 20)
+        Me.lblTimeStamp.TabIndex = 39
         '
         'lblUsed
         '
@@ -1036,14 +1051,6 @@ Partial Class Form1
         Me.Button7.TabIndex = 25
         Me.Button7.UseVisualStyleBackColor = False
         '
-        'lblTimeStamp
-        '
-        Me.lblTimeStamp.ForeColor = System.Drawing.Color.Black
-        Me.lblTimeStamp.Location = New System.Drawing.Point(15, 12)
-        Me.lblTimeStamp.Name = "lblTimeStamp"
-        Me.lblTimeStamp.Size = New System.Drawing.Size(196, 20)
-        Me.lblTimeStamp.TabIndex = 39
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1186,4 +1193,5 @@ Partial Class Form1
     Friend WithEvents ToolStripStatusLabel5 As ToolStripStatusLabel
     Friend WithEvents ToolStripStatusLabel6 As ToolStripStatusLabel
     Friend WithEvents lblTimeStamp As Label
+    Friend WithEvents ToolStripStatusLabel4 As ToolStripStatusLabel
 End Class

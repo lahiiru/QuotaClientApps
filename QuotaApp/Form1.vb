@@ -7,6 +7,7 @@ Imports Newtonsoft.Json.Linq
 Imports System.Web
 Imports System.IO
 Imports System.Configuration
+Imports System.Threading
 
 Public Class Form1
 
@@ -291,7 +292,7 @@ Public Class Form1
             ElseIf .Message.Contains("#UPDATE:") Then
                 Dim msg = .Message.Replace("#UPDATE:", "")
                 Dim json As JObject = JObject.Parse(msg)
-                updateSettings(json.SelectToken("details").SelectToken("name"), json.SelectToken("details").SelectToken("package").ToString(), json.SelectToken("details").SelectToken("usage"), json.SelectToken("details").SelectToken("comment"), json.SelectToken("details").SelectToken("banner"), json.SelectToken("status"), json.SelectToken("details").SelectToken("datetime"), json.SelectToken("details").SelectToken("utname"))
+                updateSettings(json.SelectToken("details").SelectToken("name"), json.SelectToken("details").SelectToken("package").ToString(), json.SelectToken("details").SelectToken("usage"), json.SelectToken("details").SelectToken("expired"), json.SelectToken("details").SelectToken("comment"), json.SelectToken("details").SelectToken("banner"), json.SelectToken("status"), json.SelectToken("details").SelectToken("datetime"), json.SelectToken("details").SelectToken("utname"))
             ElseIf .Message.Contains("#NEW:")
                 Dim msg = .Message.Replace("#NEW:", "")
                 Dim json As JObject = JObject.Parse(msg)
@@ -303,11 +304,12 @@ Public Class Form1
 
 
     End Sub
-    Sub updateSettings(ByVal name As String, ByVal package As String, ByVal usage As String, ByVal comment As String, ByVal banner As String, ByVal status As String, ByVal dt As String, ByVal usage_name As String)
+    Sub updateSettings(ByVal name As String, ByVal package As String, ByVal usage As String, ByVal expired As String, ByVal comment As String, ByVal banner As String, ByVal status As String, ByVal dt As String, ByVal usage_name As String)
         My.Settings.name = name
         My.Settings.fullquota = package
         My.Settings.usage = Integer.Parse(usage)
         My.Settings.quota = Integer.Parse(package) - Integer.Parse(usage)
+        My.Settings.expiry = expired
         My.Settings.comment = comment
         timestamp = dt
         utname = usage_name
@@ -336,15 +338,15 @@ Public Class Form1
         updateTime()
         lblTimeStamp.Text = timestamp
         lblRemaining.Text = (My.Settings.quota / 1000.0).ToString("N2") & " MB"
-        lblUsed.Text = (My.Settings.usage / 1000000.0).ToString("N2") & " GB"
+        lblUsed.Text = ((My.Settings.usage + offlineUsage) / 1000000.0).ToString("N2") & " GB"
         lblComment.Text = My.Settings.comment.Replace("<br>", vbNewLine)
         lblPackage.Text = (My.Settings.fullquota / 1000000.0).ToString("N2") & " GB (" & utname & ")"
         Label4.Text = (My.Settings.fullquota / 1000000.0).ToString("N2") & " GB"
         Label24.Text = (My.Settings.fullquota / 1000000.0).ToString("N2") & " GB"
-        lblExpiredOn.Text = "N/A"
+        lblExpiredOn.Text = My.Settings.expiry
         ToolStripStatusLabel3.Text = My.Settings.bssid
         ProgressBar1.Maximum = My.Settings.fullquota
-        Dim val = If(My.Settings.usage < My.Settings.fullquota, My.Settings.usage, My.Settings.fullquota)
+        Dim val = If((My.Settings.usage + offlineUsage) < My.Settings.fullquota, My.Settings.usage, My.Settings.fullquota)
         If val < 0 Then
             val = 0
         End If
@@ -365,8 +367,38 @@ Public Class Form1
             lblBlackListed.Text = "No"
             lblBlackListed.ForeColor = Color.Green
         End If
+        ToolStripStatusLabel4.Text = downSpeed & " Kbps"
     End Sub
+    Public Sub SpeedCounter()
+        counterThreadLive = True
+        While True
+            Dim wifi As System.Net.NetworkInformation.NetworkInterface = iface.NetworkInterface
+            If Not wifi Is Nothing Then
+                Dim ipv4Stats As System.Net.NetworkInformation.IPv4InterfaceStatistics
+                ipv4Stats = wifi.GetIPv4Statistics
 
+                If network.Count > 8 Then
+                    network.RemoveAt(8)
+                End If
+                network.Insert(0, Math.Truncate(ipv4Stats.BytesReceived / 1024))
+                Dim total As Integer
+                Dim speed As Integer
+
+                total = network.Item(0) - network.Item(1) + network.Item(2) - network.Item(3) + network.Item(4) - network.Item(5) + network.Item(6) - network.Item(7)
+                total = total / 2
+                speed = total
+                downSpeed = speed
+            End If
+            If downSpeed > 0 Then
+                Dim f As Integer = 250 + downSpeed * 10
+                If f > 3000 Then
+                    f = 3000
+                End If
+            End If
+            Thread.Sleep(100)
+        End While
+        counterThreadLive = False
+    End Sub
     Private Sub cmbSSID_Click(sender As Object, e As EventArgs) Handles cmbSSID.Click
         fillSSIDList()
     End Sub
@@ -550,7 +582,7 @@ Public Class Form1
         slash.Hide()
     End Sub
     Sub updateAdvert()
-        mainForm.WebBrowser1.Navigate("http://edu.wearetrying.info/quota2/web/app.php/banner/page")
+        mainForm.WebBrowser1.Navigate("http://52.24.88.15/quota2/web/app.php/banner/page")
     End Sub
 
 
@@ -687,7 +719,7 @@ Public Class Form1
         client.CachePolicy = New System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.BypassCache)
         'AddHandler client.DownloadProgressChanged, AddressOf client_ProgressChanged
         AddHandler client.DownloadStringCompleted, AddressOf updateCheckCompleted
-        client.DownloadStringAsync(New Uri("http://edu.wearetrying.info/Dropbox/quota/updates/updates.txt?t=" & getRandom(1, 99999999)))
+        client.DownloadStringAsync(New Uri("http://52.24.88.15/Dropbox/quota/updates/updates.txt?t=" & getRandom(1, 99999999)))
     End Sub
     Public Sub startUpdate(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
         UpdateTxt = "Starting..."

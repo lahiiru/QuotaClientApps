@@ -1,4 +1,5 @@
 ﻿Imports System.Net
+Imports System.Threading
 Imports SimpleWifi.Win32
 
 Module Main
@@ -19,7 +20,10 @@ Module Main
     Public utname As String = "N/A"
     Public recentlyUploaded As Boolean = False
     Public timestamp As String = Now.ToString("yyyy-MM-dd HH:mm:ss")
-
+    Public offlineUsage As Integer = 0
+    Public network As ArrayList
+    Public downSpeed As Integer = 0
+    Public counterThreadLive As Boolean = False
     Sub Main()
 
         slash.Show()
@@ -51,6 +55,17 @@ Module Main
         mainForm.ServiceController1.ServiceName = serviceName
         mainForm.loadForm()
         mainForm.Timer1.Enabled = True
+
+        network = New ArrayList
+        For j As Integer = 0 To 10
+            network.Add(0)
+        Next
+
+        If Not counterThreadLive Then
+            Dim c As Thread
+            c = New Thread(AddressOf mainForm.SpeedCounter)
+            c.Start()
+        End If
         'On Error Resume Next
         Application.Run(mainForm)
         Exit Sub

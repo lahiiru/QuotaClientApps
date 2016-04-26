@@ -116,7 +116,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("N/A")>  _
         Public Property expiry() As String
             Get
                 Return CType(Me("expiry"),String)
