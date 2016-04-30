@@ -8,9 +8,9 @@ Imports System.Web
 Imports System.IO
 Imports System.Configuration
 Imports System.Threading
+Imports System.Net.NetworkInformation
 
 Public Class Form1
-
     Public curr_ssid As String
     Private inactive_color As Color = Color.Gray
     Private active_color As Color = Color.FromArgb(219, 219, 219)
@@ -23,137 +23,12 @@ Public Class Form1
         CONNECT_NORMAL
         CONNECT_CUSTOM
     End Enum
-
-    Sub handleUserConfigCorruption()
-        Dim isConfigurationValid As Boolean = False
-        While Not isConfigurationValid
-            Try
-                Dim appSettings As AppSettingsSection = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).AppSettings
-                isConfigurationValid = True
-            Catch e As ConfigurationErrorsException
-                If e.Filename.EndsWith("user.config") Then
-                    File.Delete(e.Filename)
-                End If
-                MsgBox("User configurations were deleted due to corruption.", MsgBoxStyle.Exclamation, "Warning")
-            End Try
-        End While
-    End Sub
-    Sub loadForm()
-
-        handleUserConfigCorruption()
-        If My.Settings.ssidCollection Is Nothing Then
-            My.Settings.ssidCollection = New Specialized.StringCollection
-        End If
-
-        On Error Resume Next
-
-
-        Button1.Enabled = True
-        fillSSIDList()
-    End Sub
-    Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
-        Dim sInfo As New ProcessStartInfo("http://edu.wearetrying.info/quota2/web/app.php")
-        Process.Start(sInfo)
-    End Sub
     Dim flag As Boolean = True
     Public UpdateTxt As String = ""
     Public link As String = ""
     Public Property progress As Integer
 
-    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
-        Try
-            'cross thread stoppig and starting support
-            If connectRequest Then
-                connectRequest = False
-                serviceHandler()
-            End If
-            If disconnectRequest Then
-                disconnectRequest = False
-                stopService()
-            End If
-
-            ServiceController1.Refresh()
-            Select Case ServiceController1.Status
-                Case ServiceControllerStatus.StartPending
-                    Button2.Text = "Connecting..."
-                    Button2.Enabled = False
-                    Exit Select
-                Case ServiceControllerStatus.StopPending
-                    Button2.Text = "Disconnecting..."
-                    Button2.Enabled = False
-                    Exit Select
-                Case ServiceControllerStatus.Running
-                    Button2.Text = "Disconnect"
-                    Button2.Enabled = True
-                    Exit Select
-                Case Else
-                    Button2.Text = "Connect"
-                    Button2.Enabled = True
-                    If isConnectedTo() Then
-                        iface.Disconnect()
-                    End If
-            End Select
-        Catch ex As Exception
-
-        End Try
-        If UpdateTxt = "" Then
-            If link.Length > 10 Then
-                Button10.Text = "Update now"
-                Button10.BackColor = Color.FromArgb(192, 255, 192)
-
-                Button10.Enabled = True
-            Else
-                Button10.Text = "Check for updates"
-                Button10.BackColor = Button1.BackColor
-                Button10.Enabled = True
-            End If
-        Else
-            If Not progress = Nothing Then
-                Button10.Enabled = False
-                Button10.Text = progress & " %"
-
-            Else
-                Button10.Text = UpdateTxt
-            End If
-            Button10.Enabled = False
-        End If
-
-        If progress = 100 Then
-            progress = Nothing
-            UpdateTxt = ""
-            link = ""
-        End If
-        ToolStripStatusLabel1.Text = "v " & (iface.NetworkInterface.GetIPv4Statistics.BytesReceived / 1024000.0).ToString("N2") & " Mb."
-        ToolStripStatusLabel2.Text = "^ " & (iface.NetworkInterface.GetIPv4Statistics.BytesSent / 1024000).ToString("N2") & " Mb."
-    End Sub
-    Function isConnectedTo() As Boolean
-        If Not iface.InterfaceState = WlanInterfaceState.Connected Then
-            Return False
-        End If
-        If iface.CurrentConnection.profileName.ToUpper.Equals(curr_ssid.ToUpper()) Then
-            Return True
-        End If
-        Return False
-    End Function
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        'if button caption is CONNECT
-        If Button2.Text.ToUpper() = "CONNECT" Then
-            'SSID should select inorder to connect
-            Dim ssid = cmbSSID.Text
-            If Not ssid Is Nothing Then
-                curr_ssid = ssid
-                'MsgBox("try to connect using primary..")
-                serviceHandler()
-            End If
-        End If
-
-        'if button caption is DISCONNECT
-        If Button2.Text.ToUpper() = "DISCONNECT" Then
-            stopService()
-        End If
-
-
-    End Sub
+#Region "Service controlling functions"
     Sub stopService()
         ServiceController1.Refresh()
         If ServiceController1.Status = ServiceControllerStatus.Running Then
@@ -175,7 +50,6 @@ Public Class Form1
 
         End If
     End Sub
-    'handle the service while connecting -- send passwords to service and try to connect
     Sub serviceHandler()
         If My.Settings.ssidCollection Is Nothing Then
             My.Settings.ssidCollection = New Specialized.StringCollection
@@ -195,26 +69,6 @@ Public Class Form1
             startService(curr_ssid, pid, isSecMode, curr_passKey) 'args- (SSID,pid,secMode,[Cumstom passkey])
         End If
     End Sub
-
-    'get passkeys according to states DIFAULT / NORMAL / CUSTOM
-    Function getPassKey(ByVal ssid As String) As String
-        Dim passKey As String = ""
-
-        Select Case connect_using
-            Case ConnectState.CONNECT_DEFAULT
-                'MsgBox("connect Default mode")
-                passKey = Encode(ssid)
-            Case ConnectState.CONNECT_NORMAL
-                'MsgBox("connect normal mode")
-                passKey = ""
-            Case ConnectState.CONNECT_CUSTOM
-                'MsgBox("connect custom mode")
-                Dim result = InputBox("Please enter passkey")
-                passKey = result
-        End Select
-        Return passKey
-    End Function
-
     Sub startService(ByVal ssid As String, ByVal keyIndex As Integer, ByVal isSecMode As Integer, Optional ByVal customKey As String = "")
         Try
             ServiceController1.ServiceName = "Quota2"
@@ -242,15 +96,6 @@ Public Class Form1
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Exclamation, "Service Error")
         End Try
-    End Sub
-
-    Private Sub Button3_Click(sender As Object, e As EventArgs)
-        Dim json As JObject = JObject.Parse("{'status':'OK','details':{'name':'Lahiru Slave','package':5000000,'usage':'332345'}}")
-        MsgBox(json.SelectToken("details").SelectToken("name"))
-    End Sub
-    Sub checkAndUpdate()
-        Button10_Click()
-        autoApplyUpdates = True
     End Sub
     Public Sub processLog(ByVal [source] As Object, ByVal e As EntryWrittenEventArgs)
         With e.Entry
@@ -301,39 +146,66 @@ Public Class Form1
             End If
 
         End With
+    End Sub
+    Sub installService()
+        runner("cmd.exe", "/c @echo off && cd /d """ & Application.StartupPath & """ && title ""Quota | Installer"" && color f1 && cls && mode con: cols=46 lines=38 && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Please wait this will take few seconds... && timeout 3 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Uninstalling service... && timeout 2 > NUL && InstallUtil.exe /u svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Installing service... && timeout 2 > NUL && InstallUtil.exe /i svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Granting permissions... && timeout 2 > NUL && sc sdset quota2 D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;IU)(A;;CCLCSWLOCRRC;;;SU)(A;;CCDCLCSWRPWPDTLOCRSDRC;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD) & timeout 2 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Adding firewall exception... && timeout 2 > NUL && netsh firewall add allowedprogram """ & Application.StartupPath & "\svq.exe" & """ ""Quota Service"" ENABLE & timeout 3 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Setup finished... && timeout 2 > NUL")
+    End Sub
+#End Region
 
+#Region "UI functions"
+    Private Sub OnChangeComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
+        If Button9.Enabled Then
+            Exit Sub
+        End If
 
-    End Sub
-    Sub updateSettings(ByVal name As String, ByVal package As String, ByVal usage As String, ByVal expired As String, ByVal comment As String, ByVal banner As String, ByVal status As String, ByVal dt As String, ByVal usage_name As String)
-        My.Settings.name = name
-        My.Settings.fullquota = package
-        My.Settings.usage = Integer.Parse(usage)
-        My.Settings.quota = Integer.Parse(package) - Integer.Parse(usage)
-        My.Settings.expiry = expired
-        My.Settings.comment = comment
-        timestamp = dt
-        utname = usage_name
-        If status.Contains("BLOCKED") Then
-            My.Settings.blocked = 1
+        If Not e.Cancelled AndAlso e.Error Is Nothing Then
+            If e.Result.Equals("OK") Then
+                MsgBox("Your request is sent for approval.", MsgBoxStyle.Information, "Success")
+            Else
+                MsgBox("Couldn't process your request", MsgBoxStyle.Exclamation, "Error")
+            End If
         Else
-            My.Settings.blocked = 0
+            MsgBox("Error: " & e.Error.Message, MsgBoxStyle.Exclamation, "Error")
         End If
-        My.Settings.Save()
+        Button9.Enabled = True
     End Sub
-    Private Sub updateTime()
-        ' force to reconnect by disconnecting when user is continuely surfing through 8.00 am
-        If timestamp.Contains(" 08:01:00") And Not recentlyUploaded Then
-            recentlyUploaded = True
-            stopService()
+    Private Sub OnMessageComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
+        If Button8.Enabled Then
+            Exit Sub
+        End If
+
+        If Not e.Cancelled AndAlso e.Error Is Nothing Then
+            If e.Result.Equals("OK") Then
+                MsgBox("Your message is sent.", MsgBoxStyle.Information, "Success")
+            Else
+                MsgBox("Couldn't process your request", MsgBoxStyle.Exclamation, "Error")
+            End If
         Else
-            recentlyUploaded = False
+            MsgBox("Error: " & e.Error.Message, MsgBoxStyle.Exclamation, "Error")
         End If
-        Dim dates As String() = timestamp.Split(" ")(0).Split("-")
-        Dim times As String() = timestamp.Split(" ")(1).Split(":")
-        Dim dt As DateTime = New DateTime(Integer.Parse(dates(0)), Integer.Parse(dates(1)), Integer.Parse(dates(2)), Integer.Parse(times(0)), Integer.Parse(times(1)), Integer.Parse(times(2)))
-        dt = dt.AddSeconds(1)
-        timestamp = dt.ToString("yyyy-MM-dd HH:mm:ss")
+        Button8.Enabled = True
+        TextBox3.Text = ""
     End Sub
+    Sub updateAdvert()
+        mainForm.WebBrowser1.Navigate("http://52.24.88.15/quota2/web/app.php/banner/page")
+    End Sub
+    Function getPassKey(ByVal ssid As String) As String
+        Dim passKey As String = ""
+
+        Select Case connect_using
+            Case ConnectState.CONNECT_DEFAULT
+                'MsgBox("connect Default mode")
+                passKey = Encode(ssid)
+            Case ConnectState.CONNECT_NORMAL
+                'MsgBox("connect normal mode")
+                passKey = ""
+            Case ConnectState.CONNECT_CUSTOM
+                'MsgBox("connect custom mode")
+                Dim result = InputBox("Please enter passkey")
+                passKey = result
+        End Select
+        Return passKey
+    End Function
     Sub updateUI()
         updateTime()
         lblTimeStamp.Text = timestamp
@@ -369,40 +241,25 @@ Public Class Form1
         End If
         ToolStripStatusLabel4.Text = downSpeed & " Kbps"
     End Sub
-    Public Sub SpeedCounter()
-        counterThreadLive = True
-        While True
-            Dim wifi As System.Net.NetworkInformation.NetworkInterface = iface.NetworkInterface
-            If Not wifi Is Nothing Then
-                Dim ipv4Stats As System.Net.NetworkInformation.IPv4InterfaceStatistics
-                ipv4Stats = wifi.GetIPv4Statistics
-
-                If network.Count > 8 Then
-                    network.RemoveAt(8)
-                End If
-                network.Insert(0, Math.Truncate(ipv4Stats.BytesReceived / 1024))
-                Dim total As Integer
-                Dim speed As Integer
-
-                total = network.Item(0) - network.Item(1) + network.Item(2) - network.Item(3) + network.Item(4) - network.Item(5) + network.Item(6) - network.Item(7)
-                total = total / 2
-                speed = total
-                downSpeed = speed
-            End If
-            If downSpeed > 0 Then
-                Dim f As Integer = 250 + downSpeed * 10
-                If f > 3000 Then
-                    f = 3000
-                End If
-            End If
-            Thread.Sleep(100)
-        End While
-        counterThreadLive = False
+    Sub updateSettings(ByVal name As String, ByVal package As String, ByVal usage As String, ByVal expired As String, ByVal comment As String, ByVal banner As String, ByVal status As String, ByVal dt As String, ByVal usage_name As String)
+        My.Settings.name = name
+        My.Settings.fullquota = package
+        My.Settings.usage = Integer.Parse(usage)
+        My.Settings.quota = Integer.Parse(package) - Integer.Parse(usage)
+        My.Settings.expiry = expired
+        My.Settings.comment = comment
+        timestamp = dt
+        utname = usage_name
+        If status.Contains("BLOCKED") Then
+            My.Settings.blocked = 1
+        Else
+            My.Settings.blocked = 0
+        End If
+        My.Settings.Save()
     End Sub
-    Private Sub cmbSSID_Click(sender As Object, e As EventArgs) Handles cmbSSID.Click
-        fillSSIDList()
-    End Sub
+#End Region
 
+#Region "Network functionalities"
     Sub fillSSIDList()
         Try
             cmbSSID.Items.Clear()
@@ -420,7 +277,43 @@ Public Class Form1
         End Try
 
     End Sub
+    Public Sub SpeedCounter()
+        counterThreadLive = True
+        Dim wifi As NetworkInterface = iface.NetworkInterface
+        Dim ipv4Stats As IPv4InterfaceStatistics
 
+        While Not mainFormClosed
+            If Not wifi Is Nothing Then
+                ipv4Stats = wifi.GetIPv4Statistics
+
+                If network.Count > 8 Then
+                    network.RemoveAt(8)
+                End If
+                network.Insert(0, Math.Truncate(ipv4Stats.BytesReceived / 1024))
+                Dim total As Integer
+                Dim speed As Integer
+
+                total = network.Item(0) - network.Item(1) + network.Item(2) - network.Item(3) + network.Item(4) - network.Item(5) + network.Item(6) - network.Item(7)
+                total = total / 2
+                speed = total
+                downSpeed = speed
+            End If
+            Thread.Sleep(100)
+        End While
+        counterThreadLive = False
+    End Sub
+    Function isConnectedTo() As Boolean
+        If Not iface.InterfaceState = WlanInterfaceState.Connected Then
+            Return False
+        End If
+        If iface.CurrentConnection.profileName.ToUpper.Equals(curr_ssid.ToUpper()) Then
+            Return True
+        End If
+        Return False
+    End Function
+#End Region
+
+#Region "Utility functions"
     Private Shared Function Encode(ssid As String) As String
         Dim upper As String() = {"A", "B", "C", "D", "E", "F",
             "G", "H", "I", "J", "K", "L",
@@ -458,91 +351,6 @@ Public Class Form1
 
         Return encoded_str
     End Function
-
-    Private Sub Button5_Click(sender As Object, e As EventArgs)
-        My.Settings.ssidCollection.Clear()
-        My.Settings.pryKeyCollection.Clear()
-        My.Settings.secKeyCollection.Clear()
-        My.Settings.Save()
-
-    End Sub
-
-    Private Sub Button6_Click(sender As Object, e As EventArgs)
-
-    End Sub
-
-    Private Sub btnProfile_Click(sender As Object, e As EventArgs) Handles btnProfile.Click
-        btnProfile.BackColor = active_color
-        btnChangePackage.BackColor = inactive_color
-        btnOffer.BackColor = inactive_color
-        btnWant.BackColor = inactive_color
-        btnMessage.BackColor = inactive_color
-        btnPayment.BackColor = inactive_color
-
-        tabControl.SelectedIndex = 0
-
-
-    End Sub
-
-    Private Sub btnChangePackage_Click(sender As Object, e As EventArgs) Handles btnChangePackage.Click
-        btnProfile.BackColor = inactive_color
-        btnChangePackage.BackColor = active_color
-        btnOffer.BackColor = inactive_color
-        btnWant.BackColor = inactive_color
-        btnMessage.BackColor = inactive_color
-        btnPayment.BackColor = inactive_color
-
-        tabControl.SelectedIndex = 1
-
-    End Sub
-
-    Private Sub btnOffer_Click(sender As Object, e As EventArgs) Handles btnOffer.Click
-        btnProfile.BackColor = inactive_color
-        btnChangePackage.BackColor = inactive_color
-        btnOffer.BackColor = active_color
-        btnWant.BackColor = inactive_color
-        btnMessage.BackColor = inactive_color
-        btnPayment.BackColor = inactive_color
-
-        tabControl.SelectedIndex = 2
-
-    End Sub
-
-    Private Sub btnWant_Click(sender As Object, e As EventArgs) Handles btnWant.Click
-        btnProfile.BackColor = inactive_color
-        btnChangePackage.BackColor = inactive_color
-        btnOffer.BackColor = inactive_color
-        btnWant.BackColor = active_color
-        btnMessage.BackColor = inactive_color
-        btnPayment.BackColor = inactive_color
-
-        tabControl.SelectedIndex = 3
-
-    End Sub
-
-    Private Sub btnMessage_Click(sender As Object, e As EventArgs) Handles btnMessage.Click
-        btnProfile.BackColor = inactive_color
-        btnChangePackage.BackColor = inactive_color
-        btnOffer.BackColor = inactive_color
-        btnWant.BackColor = inactive_color
-        btnMessage.BackColor = active_color
-        btnPayment.BackColor = inactive_color
-
-        tabControl.SelectedIndex = 4
-
-    End Sub
-
-    Private Sub btnPayment_Click(sender As Object, e As EventArgs) Handles btnPayment.Click
-        btnProfile.BackColor = inactive_color
-        btnChangePackage.BackColor = inactive_color
-        btnOffer.BackColor = inactive_color
-        btnWant.BackColor = inactive_color
-        btnMessage.BackColor = inactive_color
-        btnPayment.BackColor = active_color
-
-        tabControl.SelectedIndex = 5
-
-    End Sub
     Sub runner(ByVal exe As String, ByVal args As String)
         Dim programPath = exe
         Dim procStartInfo As New ProcessStartInfo
@@ -559,14 +367,9 @@ Public Class Form1
         On Error Resume Next  'handles error when user cancels confirmation
         procExecuting = Process.Start(procStartInfo)
     End Sub
+#End Region
 
-    Private Sub Button5_Click_1(sender As Object, e As EventArgs) Handles Button5.Click
-        installService()
-    End Sub
-    Sub installService()
-        runner("cmd.exe", "/c @echo off && cd /d """ & Application.StartupPath & """ && title ""Quota | Installer"" && color f1 && cls && mode con: cols=46 lines=38 && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Please wait this will take few seconds... && timeout 3 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Uninstalling service... && timeout 2 > NUL && InstallUtil.exe /u svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Installing service... && timeout 2 > NUL && InstallUtil.exe /i svq.exe & cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Granting permissions... && timeout 2 > NUL && sc sdset quota2 D:(A;;CCLCSWRPWPDTLOCRRC;;;SY)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWLOCRRC;;;IU)(A;;CCLCSWLOCRRC;;;SU)(A;;CCDCLCSWRPWPDTLOCRSDRC;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD) & timeout 2 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Adding firewall exception... && timeout 2 > NUL && netsh firewall add allowedprogram """ & Application.StartupPath & "\svq.exe" & """ ""Quota Service"" ENABLE & timeout 3 > NUL && cls && echo. && echo    QUOTA INSTALLATION SCRIPT  TRiNE (c) 2016 && echo ============================================== && echo. && echo Setup finished... && timeout 2 > NUL")
-    End Sub
-
+#Region "Event listners"
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If New Version(My.Settings.SettingsVersion) < My.Application.Info.Version Then
             My.Settings.Upgrade()
@@ -581,11 +384,174 @@ Public Class Form1
         WebBrowser1.Visible = True
         slash.Hide()
     End Sub
-    Sub updateAdvert()
-        mainForm.WebBrowser1.Navigate("http://52.24.88.15/quota2/web/app.php/banner/page")
+    Private Sub cmbSSID_Click(sender As Object, e As EventArgs) Handles cmbSSID.Click
+        fillSSIDList()
     End Sub
+    Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
+        Dim sInfo As New ProcessStartInfo("http://edu.wearetrying.info/quota2/web/app.php")
+        Process.Start(sInfo)
+    End Sub
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+        Try
+            'cross thread stoppig and starting support
+            If connectRequest Then
+                connectRequest = False
+                serviceHandler()
+            End If
+            If disconnectRequest Then
+                disconnectRequest = False
+                stopService()
+            End If
+
+            ServiceController1.Refresh()
+            Select Case ServiceController1.Status
+                Case ServiceControllerStatus.StartPending
+                    Button2.Text = "Connecting..."
+                    Button2.Enabled = False
+                    Exit Select
+                Case ServiceControllerStatus.StopPending
+                    Button2.Text = "Disconnecting..."
+                    Button2.Enabled = False
+                    Exit Select
+                Case ServiceControllerStatus.Running
+                    Button2.Text = "Disconnect"
+                    Button2.Enabled = True
+                    Exit Select
+                Case Else
+                    Button2.Text = "Connect"
+                    Button2.Enabled = True
+                    If isConnectedTo() Then
+                        iface.Disconnect()
+                    End If
+            End Select
+        Catch ex As Exception
+
+        End Try
+        If UpdateTxt = "" Then
+            If link.Length > 10 Then
+                Button10.Text = "Update now"
+                Button10.BackColor = Color.FromArgb(192, 255, 192)
+                Button10.Enabled = True
+            Else
+                Button10.Text = "Check for updates"
+                Button10.BackColor = Button1.BackColor
+                Button10.Enabled = True
+            End If
+        Else
+            If Not progress = Nothing Then
+                Button10.Enabled = False
+                Button10.Text = progress & " %"
+
+            Else
+                Button10.Text = UpdateTxt
+            End If
+            Button10.Enabled = False
+        End If
+
+        If progress = 100 Then
+            progress = Nothing
+            UpdateTxt = ""
+            link = ""
+        End If
+
+        ToolStripStatusLabel1.Text = "v " & (nif.GetIPv4Statistics.BytesReceived / 1024000.0).ToString("N2") & " Mb."
+        ToolStripStatusLabel2.Text = "^ " & (nif.GetIPv4Statistics.BytesSent / 1024000).ToString("N2") & " Mb."
+    End Sub
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        'if button caption is CONNECT
+        If Button2.Text.ToUpper() = "CONNECT" Then
+            'SSID should select inorder to connect
+            Dim ssid = cmbSSID.Text
+            If Not ssid Is Nothing Then
+                curr_ssid = ssid
+                'MsgBox("try to connect using primary..")
+                serviceHandler()
+            End If
+        End If
+
+        'if button caption is DISCONNECT
+        If Button2.Text.ToUpper() = "DISCONNECT" Then
+            stopService()
+        End If
+    End Sub
+    Private Sub Button3_Click(sender As Object, e As EventArgs)
+        Dim json As JObject = JObject.Parse("{'status':'OK','details':{'name':'Lahiru Slave','package':5000000,'usage':'332345'}}")
+        MsgBox(json.SelectToken("details").SelectToken("name"))
+    End Sub
+    Private Sub Button5_Click(sender As Object, e As EventArgs)
+        My.Settings.ssidCollection.Clear()
+        My.Settings.pryKeyCollection.Clear()
+        My.Settings.secKeyCollection.Clear()
+        My.Settings.Save()
+    End Sub
+    Private Sub btnProfile_Click(sender As Object, e As EventArgs) Handles btnProfile.Click
+        btnProfile.BackColor = active_color
+        btnChangePackage.BackColor = inactive_color
+        btnOffer.BackColor = inactive_color
+        btnWant.BackColor = inactive_color
+        btnMessage.BackColor = inactive_color
+        btnPayment.BackColor = inactive_color
+
+        tabControl.SelectedIndex = 0
 
 
+    End Sub
+    Private Sub btnChangePackage_Click(sender As Object, e As EventArgs) Handles btnChangePackage.Click
+        btnProfile.BackColor = inactive_color
+        btnChangePackage.BackColor = active_color
+        btnOffer.BackColor = inactive_color
+        btnWant.BackColor = inactive_color
+        btnMessage.BackColor = inactive_color
+        btnPayment.BackColor = inactive_color
+
+        tabControl.SelectedIndex = 1
+    End Sub
+    Private Sub btnOffer_Click(sender As Object, e As EventArgs) Handles btnOffer.Click
+        btnProfile.BackColor = inactive_color
+        btnChangePackage.BackColor = inactive_color
+        btnOffer.BackColor = active_color
+        btnWant.BackColor = inactive_color
+        btnMessage.BackColor = inactive_color
+        btnPayment.BackColor = inactive_color
+
+        tabControl.SelectedIndex = 2
+    End Sub
+    Private Sub btnWant_Click(sender As Object, e As EventArgs) Handles btnWant.Click
+        btnProfile.BackColor = inactive_color
+        btnChangePackage.BackColor = inactive_color
+        btnOffer.BackColor = inactive_color
+        btnWant.BackColor = active_color
+        btnMessage.BackColor = inactive_color
+        btnPayment.BackColor = inactive_color
+
+        tabControl.SelectedIndex = 3
+
+    End Sub
+    Private Sub btnMessage_Click(sender As Object, e As EventArgs) Handles btnMessage.Click
+        btnProfile.BackColor = inactive_color
+        btnChangePackage.BackColor = inactive_color
+        btnOffer.BackColor = inactive_color
+        btnWant.BackColor = inactive_color
+        btnMessage.BackColor = active_color
+        btnPayment.BackColor = inactive_color
+
+        tabControl.SelectedIndex = 4
+
+    End Sub
+    Private Sub btnPayment_Click(sender As Object, e As EventArgs) Handles btnPayment.Click
+        btnProfile.BackColor = inactive_color
+        btnChangePackage.BackColor = inactive_color
+        btnOffer.BackColor = inactive_color
+        btnWant.BackColor = inactive_color
+        btnMessage.BackColor = inactive_color
+        btnPayment.BackColor = active_color
+
+        tabControl.SelectedIndex = 5
+
+    End Sub
+    Private Sub Button5_Click_1(sender As Object, e As EventArgs) Handles Button5.Click
+        installService()
+    End Sub
     Private Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
         updateUI()
 
@@ -597,11 +563,9 @@ Public Class Form1
         End If
 
     End Sub
-
     Private Sub Button6_Click_1(sender As Object, e As EventArgs)
         My.Settings.Reset()
     End Sub
-
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         Dim tokens As New OAuthTokens()
         tokens.AccessToken = "2777805621-3B5b5U3dcQm7HuqzWIiimf0J08JYC4XpUiYF3Vq"
@@ -621,15 +585,9 @@ Public Class Form1
             MsgBox("Error occured! " & tweetResponse.Content, MsgBoxStyle.Exclamation, "Error")
         End If
     End Sub
-
-    Private Sub tabProfile_Click(sender As Object, e As EventArgs) Handles tabProfile.Click
-
-    End Sub
-
     Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
         Label9.Text = (Val(TextBox1.Text) / 1000000.0).ToString("N2") & " GB"
     End Sub
-
     Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
         If Val(TextBox1.Text) < 1000 Then
             MsgBox("Invalid package", MsgBoxStyle.Information, "Error")
@@ -643,23 +601,6 @@ Public Class Form1
             Button9.Enabled = True
         End Try
     End Sub
-    Private Sub OnChangeComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
-        If Button9.Enabled Then
-            Exit Sub
-        End If
-
-        If Not e.Cancelled AndAlso e.Error Is Nothing Then
-            If e.Result.Equals("OK") Then
-                MsgBox("Your request is sent for approval.", MsgBoxStyle.Information, "Success")
-            Else
-                MsgBox("Couldn't process your request", MsgBoxStyle.Exclamation, "Error")
-            End If
-        Else
-            MsgBox("Error: " & e.Error.Message, MsgBoxStyle.Exclamation, "Error")
-        End If
-        Button9.Enabled = True
-    End Sub
-
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click
         If TextBox2.Text.Length < 0 And TextBox3.Text.Length < 0 Then
             MsgBox("Invalid subject or body", MsgBoxStyle.Information, "Error")
@@ -674,27 +615,15 @@ Public Class Form1
             Button8.Enabled = True
         End Try
     End Sub
-    Private Sub OnMessageComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
-        If Button8.Enabled Then
-            Exit Sub
-        End If
-
-        If Not e.Cancelled AndAlso e.Error Is Nothing Then
-            If e.Result.Equals("OK") Then
-                MsgBox("Your message is sent.", MsgBoxStyle.Information, "Success")
-            Else
-                MsgBox("Couldn't process your request", MsgBoxStyle.Exclamation, "Error")
-            End If
-        Else
-            MsgBox("Error: " & e.Error.Message, MsgBoxStyle.Exclamation, "Error")
-        End If
-        Button8.Enabled = True
-        TextBox3.Text = ""
-    End Sub
     Private Sub TextBox4_TextChanged(sender As Object, e As EventArgs) Handles TextBox4.TextChanged
         Label19.Text = (Val(TextBox4.Text) / 1000000.0).ToString("N2") & " GB"
     End Sub
-#Region "update"
+    Private Sub Form1_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+        mainFormClosed = True
+    End Sub
+#End Region
+
+#Region "App update functionality"
     Function getRandom(ByVal min As Integer, ByVal max As Integer)
         Dim gen As System.Random = New System.Random()
         Return gen.Next(min, max)
@@ -797,5 +726,53 @@ Public Class Form1
         Threading.Thread.Sleep(1000)
         End
     End Sub
+    Sub checkAndUpdate()
+        Button10_Click()
+        autoApplyUpdates = True
+    End Sub
 #End Region
+
+#Region "Other support functions"
+    Private Sub updateTime()
+        ' force to reconnect by disconnecting when user is continuely surfing through 8.00 am
+        If timestamp.Contains(" 08:01:00") And Not recentlyUploaded Then
+            recentlyUploaded = True
+            stopService()
+        Else
+            recentlyUploaded = False
+        End If
+        Dim dates As String() = timestamp.Split(" ")(0).Split("-")
+        Dim times As String() = timestamp.Split(" ")(1).Split(":")
+        Dim dt As DateTime = New DateTime(Integer.Parse(dates(0)), Integer.Parse(dates(1)), Integer.Parse(dates(2)), Integer.Parse(times(0)), Integer.Parse(times(1)), Integer.Parse(times(2)))
+        dt = dt.AddSeconds(1)
+        timestamp = dt.ToString("yyyy-MM-dd HH:mm:ss")
+    End Sub
+    Sub handleUserConfigCorruption()
+        Dim isConfigurationValid As Boolean = False
+        While Not isConfigurationValid
+            Try
+                Dim appSettings As AppSettingsSection = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).AppSettings
+                isConfigurationValid = True
+            Catch e As ConfigurationErrorsException
+                If e.Filename.EndsWith("user.config") Then
+                    File.Delete(e.Filename)
+                End If
+                MsgBox("User configurations were deleted due to corruption.", MsgBoxStyle.Exclamation, "Warning")
+            End Try
+        End While
+    End Sub
+    Sub loadForm()
+        handleUserConfigCorruption()
+        If My.Settings.ssidCollection Is Nothing Then
+            My.Settings.ssidCollection = New Specialized.StringCollection
+        End If
+
+        On Error Resume Next
+
+
+        Button1.Enabled = True
+        fillSSIDList()
+    End Sub
+#End Region
+
 End Class

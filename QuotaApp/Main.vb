@@ -1,4 +1,5 @@
 ﻿Imports System.Net
+Imports System.Net.NetworkInformation
 Imports System.Threading
 Imports SimpleWifi.Win32
 
@@ -24,12 +25,14 @@ Module Main
     Public network As ArrayList
     Public downSpeed As Integer = 0
     Public counterThreadLive As Boolean = False
+    Public nif As NetworkInterface
+    Public mainFormClosed As Boolean = False
     Sub Main()
-
         slash.Show()
         Application.DoEvents()
         'On Error GoTo e107
         iface = client.Interfaces(0)
+        nif = iface.NetworkInterface
         mainForm.WebBrowser1.Navigate("about:blank")
         mainForm.WebBrowser1.Document.Write("<body bgcolor='#7f7f7f'></body>")
         Application.DoEvents()
@@ -77,8 +80,6 @@ e108:
         Exit Sub
 e109:
         MsgBox("Error 109 occured!" & Err.Description & vbNewLine & Err.Source, MsgBoxStyle.Exclamation, "Error")
-
-
     End Sub
 
 End Module
