@@ -97,9 +97,7 @@ Partial Class Form1
         Me.tabPayments = New System.Windows.Forms.TabPage()
         Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         Me.Panel2 = New System.Windows.Forms.Panel()
-        Me.Button1 = New System.Windows.Forms.Button()
         Me.Button10 = New System.Windows.Forms.Button()
-        Me.Button4 = New System.Windows.Forms.Button()
         Me.Button5 = New System.Windows.Forms.Button()
         Me.btnProfile = New System.Windows.Forms.Button()
         Me.btnChangePackage = New System.Windows.Forms.Button()
@@ -872,28 +870,12 @@ Partial Class Form1
         'Panel2
         '
         Me.Panel2.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.Panel2.Controls.Add(Me.Button1)
         Me.Panel2.Controls.Add(Me.Button10)
-        Me.Panel2.Controls.Add(Me.Button4)
         Me.Panel2.Controls.Add(Me.Button5)
         Me.Panel2.Location = New System.Drawing.Point(591, 163)
         Me.Panel2.Name = "Panel2"
         Me.Panel2.Size = New System.Drawing.Size(146, 266)
         Me.Panel2.TabIndex = 37
-        '
-        'Button1
-        '
-        Me.Button1.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
-        Me.Button1.Enabled = False
-        Me.Button1.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Yellow
-        Me.Button1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button1.Location = New System.Drawing.Point(13, 44)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(97, 45)
-        Me.Button1.TabIndex = 2
-        Me.Button1.Text = "Send tweet"
-        Me.Button1.UseVisualStyleBackColor = False
         '
         'Button10
         '
@@ -901,25 +883,12 @@ Partial Class Form1
         Me.Button10.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Yellow
         Me.Button10.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Button10.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button10.Location = New System.Drawing.Point(13, 97)
+        Me.Button10.Location = New System.Drawing.Point(13, 49)
         Me.Button10.Name = "Button10"
         Me.Button10.Size = New System.Drawing.Size(97, 45)
         Me.Button10.TabIndex = 3
         Me.Button10.Text = "Check for updates"
         Me.Button10.UseVisualStyleBackColor = False
-        '
-        'Button4
-        '
-        Me.Button4.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
-        Me.Button4.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Yellow
-        Me.Button4.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
-        Me.Button4.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button4.Location = New System.Drawing.Point(13, 204)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(97, 45)
-        Me.Button4.TabIndex = 4
-        Me.Button4.Text = "__"
-        Me.Button4.UseVisualStyleBackColor = False
         '
         'Button5
         '
@@ -927,7 +896,7 @@ Partial Class Form1
         Me.Button5.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Yellow
         Me.Button5.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button5.Location = New System.Drawing.Point(13, 150)
+        Me.Button5.Location = New System.Drawing.Point(13, 104)
         Me.Button5.Name = "Button5"
         Me.Button5.Size = New System.Drawing.Size(97, 45)
         Me.Button5.TabIndex = 5
@@ -1125,7 +1094,6 @@ Partial Class Form1
     Friend WithEvents tabControl As System.Windows.Forms.TabControl
     Friend WithEvents tabProfile As System.Windows.Forms.TabPage
     Friend WithEvents Button5 As System.Windows.Forms.Button
-    Friend WithEvents Button4 As System.Windows.Forms.Button
     Friend WithEvents Button10 As System.Windows.Forms.Button
     Friend WithEvents lblComment As System.Windows.Forms.TextBox
     Friend WithEvents Label6 As System.Windows.Forms.Label
@@ -1136,7 +1104,6 @@ Partial Class Form1
     Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents lblPackage As System.Windows.Forms.Label
     Friend WithEvents lblRemaining As System.Windows.Forms.Label
-    Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents Label16 As System.Windows.Forms.Label
     Friend WithEvents tabChnageMyPackage As System.Windows.Forms.TabPage
     Friend WithEvents btnPayment As System.Windows.Forms.Button

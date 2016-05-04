@@ -11,6 +11,7 @@ Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Collections.Specialized
 Imports System.Configuration
 
+
 Public Class QuotaService
     Public client As SimpleWifi.Win32.WlanClient = New SimpleWifi.Win32.WlanClient
     Public iface As SimpleWifi.Win32.WlanInterface
@@ -144,11 +145,9 @@ retry:
         preparePending()
         If (Not iface.NetworkInterface.OperationalStatus = NetworkInformation.OperationalStatus.Up) Or (Not isConnectedTo()) Then
             My.Settings.Save()
-            Log("Debug code 113")
+            Log("Debug code 113 with " & iface.NetworkInterface.OperationalStatus.ToString())
             Me.Stop()
         End If
-
-
 
         If (My.Settings.pending > 20000) Then
             Log("Debug code 112")
@@ -229,16 +228,23 @@ retry:
         End If
     End Sub
     Sub usercheck()
-
         Dim url As String = requestHandler & "check"
+        Dim tries = 0
+retry:
         Log("Posting to: " & url)
         Try
             Dim response As String = wc.DownloadString(url)
             processResponse(response)
             Log("Debug code 115")
         Catch ex As Exception
+            tries = tries + 1
+            If tries < 5 Then
+                Log("User check tries " & tries)
+                Thread.Sleep(4000)
+                GoTo retry
+            End If
             disconnect()
-            LogMsg("Internal server error occured!!" & vbNewLine & Err.Description & Err.Source & " line => " & Err.Erl, MsgBoxStyle.Exclamation)
+            LogMsg("Unable to connect to Quota server!" & vbNewLine & ex.Message & vbNewLine & ex.InnerException.Message & vbNewLine & ex.Source, MsgBoxStyle.Exclamation)
             irregularStop = True
             Me.Stop()
         End Try

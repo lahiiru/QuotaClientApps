@@ -2,7 +2,7 @@
 Imports System.Net.NetworkInformation
 Imports System.Threading
 Imports SimpleWifi.Win32
-
+Imports System.Runtime.InteropServices
 Module Main
     Public iface As SimpleWifi.Win32.WlanInterface = Nothing
     Public requestHandler As String = "http://52.24.88.15/quota2/web/app.php/request"
@@ -27,14 +27,22 @@ Module Main
     Public counterThreadLive As Boolean = False
     Public nif As NetworkInterface
     Public mainFormClosed As Boolean = False
+    Public M As Mutex
     Sub Main()
         slash.Show()
         Application.DoEvents()
+        Try
+            Dim M = Mutex.OpenExisting("Quota")
+            MsgBox("Quota already is running." & vbNewLine & "Please check task manager.", MsgBoxStyle.Exclamation, "Quota starter")
+            Environment.Exit(0)
+        Catch ex As Exception
+            Dim M = New Mutex(True, "Quota")
+        End Try
         'On Error GoTo e107
         iface = client.Interfaces(0)
         nif = iface.NetworkInterface
-        mainForm.WebBrowser1.Navigate("about:blank")
-        mainForm.WebBrowser1.Document.Write("<body bgcolor='#7f7f7f'></body>")
+        mainForm.WebBrowser1.Navigate("about: blank")
+        mainForm.WebBrowser1.Document.Write("<body bgcolor='#3C8DBC'></body>")
         Application.DoEvents()
         If IsNothing(iface) Then
             MsgBox("Couldn't find wifi adapter!", MsgBoxStyle.Information)

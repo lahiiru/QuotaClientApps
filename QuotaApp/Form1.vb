@@ -10,6 +10,7 @@ Imports System.Configuration
 Imports System.Threading
 Imports System.Net.NetworkInformation
 
+
 Public Class Form1
     Public curr_ssid As String
     Private inactive_color As Color = Color.Gray
@@ -27,7 +28,6 @@ Public Class Form1
     Public UpdateTxt As String = ""
     Public link As String = ""
     Public Property progress As Integer
-
 #Region "Service controlling functions"
     Sub stopService()
         ServiceController1.Refresh()
@@ -434,7 +434,7 @@ Public Class Form1
                 Button10.Enabled = True
             Else
                 Button10.Text = "Check for updates"
-                Button10.BackColor = Button1.BackColor
+                Button10.BackColor = Button2.BackColor
                 Button10.Enabled = True
             End If
         Else
@@ -566,7 +566,7 @@ Public Class Form1
     Private Sub Button6_Click_1(sender As Object, e As EventArgs)
         My.Settings.Reset()
     End Sub
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Sub Button1_Click(sender As Object, e As EventArgs)
         Dim tokens As New OAuthTokens()
         tokens.AccessToken = "2777805621-3B5b5U3dcQm7HuqzWIiimf0J08JYC4XpUiYF3Vq"
         tokens.AccessTokenSecret = "cbfgOaH5FpNScgXf97Rt5AL2ryfLin7K4tAFS1OtEwU5S"
@@ -768,11 +768,9 @@ Public Class Form1
         End If
 
         On Error Resume Next
-
-
-        Button1.Enabled = True
         fillSSIDList()
     End Sub
+
 #End Region
 
 End Class
