@@ -3,6 +3,9 @@ Imports System.Net.NetworkInformation
 Imports System.Threading
 Imports SimpleWifi.Win32
 Imports System.Runtime.InteropServices
+Imports System.Configuration
+Imports System.IO
+
 Module Main
     Public iface As SimpleWifi.Win32.WlanInterface = Nothing
     Public requestHandler As String = "http://52.24.88.15/quota2/web/app.php/request"
@@ -48,7 +51,23 @@ Module Main
             MsgBox("Couldn't find wifi adapter!", MsgBoxStyle.Information)
             Exit Sub
         End If
-        'On Error GoTo e108
+
+        'Handle user.config corruption
+        Try
+            My.Settings.Reload()
+            Dim x = My.Settings.bssid
+        Catch ex As Exception
+            Dim e As ConfigurationErrorsException
+            e = ex.InnerException
+            Dim filename As String = e.Filename
+            If MsgBox("Settings are corrupted. Press OK to reset." & vbNewLine & ex.Message, MsgBoxStyle.OkCancel, "Startup error") = MsgBoxResult.Ok Then
+                File.Delete(filename)
+                My.Settings.Reload()
+            Else
+                End
+            End If
+        End Try
+
         mac = iface.NetworkInterface.GetPhysicalAddress.ToString()
         requestHandler = requestHandler & "/user/" & Web.HttpUtility.UrlPathEncode(My.Settings.bssid) & "/" & mac & "/"
         wc.Headers(HttpRequestHeader.UserAgent) = "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727)"
