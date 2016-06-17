@@ -169,6 +169,33 @@ Public Class Form1
         End If
         Button9.Enabled = True
     End Sub
+    Private Sub OnCheckPaymentComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
+        If Button1.Enabled Then
+            Exit Sub
+        End If
+
+        If Not e.Cancelled AndAlso e.Error Is Nothing Then
+            Try
+                Dim a As JArray = JArray.Parse(e.Result)
+                Dim fee As String
+                Dim day As String
+                Dim no As String
+                For Each o As JObject In a.Children(Of JObject)
+                    fee = o.SelectToken("fee").ToString()
+                    day = o.SelectToken("date").ToString()
+                    no = o.SelectToken("id").ToString()
+                    TextBox6.AppendText("Payment Rs." & fee & ".00 received on " & day & " with ref no." & no)
+                Next
+
+
+            Catch ex As Exception
+                MsgBox("Error: " & e.Error.Message, MsgBoxStyle.Exclamation, "Error")
+            End Try
+        Else
+            MsgBox("Error: " & e.Error.Message, MsgBoxStyle.Exclamation, "Error")
+        End If
+        Button1.Enabled = True
+    End Sub
     Private Sub OnMessageComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
         If Button8.Enabled Then
             Exit Sub
@@ -566,7 +593,7 @@ Public Class Form1
     Private Sub Button6_Click_1(sender As Object, e As EventArgs)
         My.Settings.Reset()
     End Sub
-    Private Sub Button1_Click(sender As Object, e As EventArgs)
+    Private Sub Button1_Click1(sender As Object, e As EventArgs)
         Dim tokens As New OAuthTokens()
         tokens.AccessToken = "2777805621-3B5b5U3dcQm7HuqzWIiimf0J08JYC4XpUiYF3Vq"
         tokens.AccessTokenSecret = "cbfgOaH5FpNScgXf97Rt5AL2ryfLin7K4tAFS1OtEwU5S"
@@ -599,6 +626,16 @@ Public Class Form1
         Catch ex As Exception
             MsgBox("Error in comunication", MsgBoxStyle.Information, "Error")
             Button9.Enabled = True
+        End Try
+    End Sub
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Try
+            Button1.Enabled = False
+            AddHandler wc.DownloadStringCompleted, AddressOf OnCheckPaymentComplete
+            wc.DownloadStringAsync(New Uri(requestHandler & "checkpayment"))
+        Catch ex As Exception
+            MsgBox("Error in comunication", MsgBoxStyle.Information, "Error")
+            Button1.Enabled = True
         End Try
     End Sub
     Private Sub Button8_Click(sender As Object, e As EventArgs) Handles Button8.Click

@@ -42,8 +42,14 @@ Module Main
             Dim M = New Mutex(True, "Quota")
         End Try
         'On Error GoTo e107
-        iface = client.Interfaces(0)
-        nif = iface.NetworkInterface
+        Try
+            iface = client.Interfaces(0)
+            nif = iface.NetworkInterface
+        Catch ex As Exception
+            MsgBox("Couldn't find wifi adapter!", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End Try
+
         mainForm.WebBrowser1.Navigate("about: blank")
         mainForm.WebBrowser1.Document.Write("<body bgcolor='#3C8DBC'></body>")
         Application.DoEvents()
