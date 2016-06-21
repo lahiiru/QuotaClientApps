@@ -7,6 +7,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QuotaService", "QuotaServic
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "QuotaApp", "QuotaApp\QuotaApp.vbproj", "{D72621B2-2D5A-4927-A300-6B0B2625C87C}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "UnitTestProject1", "UnitTestProject1\UnitTestProject1.vbproj", "{E1D2CAC6-BBE1-4E0F-8860-55CBD0A5A10F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D72621B2-2D5A-4927-A300-6B0B2625C87C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1D2CAC6-BBE1-4E0F-8860-55CBD0A5A10F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1D2CAC6-BBE1-4E0F-8860-55CBD0A5A10F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1D2CAC6-BBE1-4E0F-8860-55CBD0A5A10F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1D2CAC6-BBE1-4E0F-8860-55CBD0A5A10F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
