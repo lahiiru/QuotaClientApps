@@ -1,14 +1,14 @@
 ﻿Imports System.Net
 Imports System.Net.NetworkInformation
 Imports System.Threading
-Imports SimpleWifi.Win32
-Imports System.Runtime.InteropServices
 Imports System.Configuration
 Imports System.IO
+Imports SimpleWifi.Win32
 
 Module Main
-    Public iface As SimpleWifi.Win32.WlanInterface = Nothing
-    Public requestHandler As String = "http://52.24.88.15/quota2/web/app.php/request"
+    Public iface As WlanInterface = Nothing
+    Public requestHandlerBase As String = "http://quota.wearetrying.info/request"
+    Public updateIndexURL As String = "http://wearetrying.info/builds/quota/index.txt"
     Public mac As String = ""
     Public wc As WebClient = New WebClient
     Public client As WlanClient = New WlanClient()
@@ -30,6 +30,7 @@ Module Main
     Public counterThreadLive As Boolean = False
     Public nif As NetworkInterface
     Public mainFormClosed As Boolean = False
+    Public curr_ssid As String = "not-set"
     Public M As Mutex
     Sub Main()
         slash.Show()
@@ -73,13 +74,25 @@ Module Main
                 End
             End If
         End Try
-
         mac = iface.NetworkInterface.GetPhysicalAddress.ToString()
-        requestHandler = requestHandler & "/user/" & Web.HttpUtility.UrlPathEncode(My.Settings.bssid) & "/" & mac & "/"
         wc.Headers(HttpRequestHeader.UserAgent) = "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727)"
-        wc.Proxy = Nothing
+        wc.Proxy = GlobalProxySelection.GetEmptyWebProxy()
+
+        WebRequest.DefaultWebProxy = Nothing
+
+        ServicePointManager.DefaultConnectionLimit = 100
+
         Application.DoEvents()
+
+        'create custom log called Quatalog
         myLog.Log = "QuotaLog"
+        myLog.Source = "QuotaSvr"
+
+        Try
+            EventLog.CreateEventSource("QuotaSvr", "QuotaLog")
+        Catch ex As Exception
+        End Try
+
         AddHandler myLog.EntryWritten, AddressOf mainForm.processLog
         Try
             myLog.EnableRaisingEvents = True
@@ -102,6 +115,7 @@ Module Main
             c = New Thread(AddressOf mainForm.SpeedCounter)
             c.Start()
         End If
+
         'On Error Resume Next
         Application.Run(mainForm)
         Exit Sub
@@ -114,5 +128,8 @@ e108:
 e109:
         MsgBox("Error 109 occured!" & Err.Description & vbNewLine & Err.Source, MsgBoxStyle.Exclamation, "Error")
     End Sub
+    Function GetRequestHandlerURL() As String
+        Return requestHandlerBase & "/user/" & Web.HttpUtility.UrlPathEncode(curr_ssid) & "/" & mac & "/"
+    End Function
 
 End Module

@@ -8,17 +8,17 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("Quota")>
-<Assembly: AssemblyDescription("Shared wifi costing system")>
-<Assembly: AssemblyCompany("TRiNE")>
-<Assembly: AssemblyProduct("Quota")>
-<Assembly: AssemblyCopyright("Copyright ©  2017 quota.wearetrying.info")>
+<Assembly: AssemblyTitle("UnitTestProject1")>
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("UnitTestProject1")>
+<Assembly: AssemblyCopyright("Copyright ©  2016")>
 <Assembly: AssemblyTrademark("")>
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("215adab3-0096-43b4-bc94-ea8baa068316")>
+<Assembly: Guid("98de1077-d42f-49cd-a563-1ebf8a03618b")>
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.1.0.4")>
-<Assembly: AssemblyFileVersion("1.1.0.4")>
+<Assembly: AssemblyVersion("1.0.0.0")>
+<Assembly: AssemblyFileVersion("1.0.0.0")>

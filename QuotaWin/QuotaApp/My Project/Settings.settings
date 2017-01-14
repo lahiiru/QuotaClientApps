@@ -21,7 +21,7 @@
       <Value Profile="(Default)">N/A</Value>
     </Setting>
     <Setting Name="bssid" Type="System.String" Scope="User">
-      <Value Profile="(Default)">NO FREE</Value>
+      <Value Profile="(Default)">not-set</Value>
     </Setting>
     <Setting Name="name" Type="System.String" Scope="User">
       <Value Profile="(Default)">Unkown</Value>

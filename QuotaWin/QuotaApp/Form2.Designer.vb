@@ -61,6 +61,7 @@ Partial Class Form2
         '
         'Button1
         '
+        Me.Button1.BackColor = System.Drawing.Color.Gainsboro
         Me.Button1.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(128, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(128, Byte), Integer))
         Me.Button1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer))
         Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
@@ -71,7 +72,7 @@ Partial Class Form2
         Me.Button1.Size = New System.Drawing.Size(113, 34)
         Me.Button1.TabIndex = 4
         Me.Button1.Text = "JOIN"
-        Me.Button1.UseVisualStyleBackColor = True
+        Me.Button1.UseVisualStyleBackColor = False
         '
         'TextBox1
         '

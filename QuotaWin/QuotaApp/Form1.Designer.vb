@@ -95,6 +95,7 @@ Partial Class Form1
         Me.Label17 = New System.Windows.Forms.Label()
         Me.Label18 = New System.Windows.Forms.Label()
         Me.tabPayments = New System.Windows.Forms.TabPage()
+        Me.Button4 = New System.Windows.Forms.Button()
         Me.Panel7 = New System.Windows.Forms.Panel()
         Me.TextBox6 = New System.Windows.Forms.TextBox()
         Me.Button1 = New System.Windows.Forms.Button()
@@ -112,7 +113,6 @@ Partial Class Form1
         Me.Timer2 = New System.Windows.Forms.Timer(Me.components)
         Me.WebBrowser1 = New System.Windows.Forms.WebBrowser()
         Me.Button7 = New System.Windows.Forms.Button()
-        Me.Button4 = New System.Windows.Forms.Button()
         CType(Me.EventLog1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
         Me.tabControl.SuspendLayout()
@@ -194,7 +194,7 @@ Partial Class Form1
         Me.ToolStripStatusLabel5.Margin = New System.Windows.Forms.Padding(20, 3, 0, 2)
         Me.ToolStripStatusLabel5.Name = "ToolStripStatusLabel5"
         Me.ToolStripStatusLabel5.Size = New System.Drawing.Size(83, 17)
-        Me.ToolStripStatusLabel5.Text = "2016 © TRiNE."
+        Me.ToolStripStatusLabel5.Text = "2017 © TRiNE."
         '
         'ToolStripStatusLabel6
         '
@@ -865,6 +865,20 @@ Partial Class Form1
         Me.tabPayments.TabIndex = 5
         Me.tabPayments.Text = "TabPage6"
         '
+        'Button4
+        '
+        Me.Button4.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.Button4.FlatAppearance.BorderSize = 0
+        Me.Button4.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.Button4.FlatAppearance.MouseOverBackColor = System.Drawing.Color.White
+        Me.Button4.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button4.Location = New System.Drawing.Point(-90, 45)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(95, 225)
+        Me.Button4.TabIndex = 38
+        Me.Button4.UseVisualStyleBackColor = False
+        Me.Button4.Visible = False
+        '
         'Panel7
         '
         Me.Panel7.BackColor = System.Drawing.Color.White
@@ -1073,20 +1087,6 @@ Partial Class Form1
         Me.Button7.Size = New System.Drawing.Size(736, 160)
         Me.Button7.TabIndex = 25
         Me.Button7.UseVisualStyleBackColor = False
-        '
-        'Button4
-        '
-        Me.Button4.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
-        Me.Button4.FlatAppearance.BorderSize = 0
-        Me.Button4.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
-        Me.Button4.FlatAppearance.MouseOverBackColor = System.Drawing.Color.White
-        Me.Button4.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button4.Location = New System.Drawing.Point(-90, 45)
-        Me.Button4.Name = "Button4"
-        Me.Button4.Size = New System.Drawing.Size(95, 225)
-        Me.Button4.TabIndex = 38
-        Me.Button4.UseVisualStyleBackColor = False
-        Me.Button4.Visible = False
         '
         'Form1
         '

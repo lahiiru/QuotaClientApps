@@ -53,8 +53,11 @@ Public Class Form2
 
         Try
             Button1.Enabled = False
-            AddHandler wc.DownloadStringCompleted, AddressOf OnChangeComplete
-            Dim s As String = String.Format("{0}new/{1}/{2}/{3}", requestHandler, name, kbytes, Web.HttpUtility.UrlPathEncode(msg))
+            AddHandler wc.DownloadStringCompleted, AddressOf OnDlComplete
+            AddHandler wc.DownloadProgressChanged, AddressOf OnChangeComplete
+
+            Dim s As String = String.Format("{0}new/{1}/{2}/{3}", GetRequestHandlerURL(), name, kbytes, Web.HttpUtility.UrlPathEncode(msg))
+            Log("Sending new client request: " & s)
             wc.DownloadStringAsync(New Uri(s))
             Return True
         Catch ex As Exception
@@ -63,8 +66,14 @@ Public Class Form2
             Return False
         End Try
     End Function
+    Sub Log(msg As String)
+        myLog.WriteEntry(msg)
+    End Sub
+    Private Sub OnChangeComplete(ByVal sender As Object, ByVal e As DownloadProgressChangedEventArgs)
+        Button1.Text = e.ProgressPercentage
+    End Sub
 
-    Private Sub OnChangeComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
+    Private Sub OnDlComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
         disconnectRequest = True  'disconnect
 
         If Button1.Enabled Then
@@ -72,6 +81,7 @@ Public Class Form2
         End If
 
         If Not e.Cancelled AndAlso e.Error Is Nothing Then
+            Log("New client request response: " & e.Result)
             If e.Result.Equals("OK") Then
                 MsgBox("Your registration request is sent for approval.", MsgBoxStyle.Information, "Success")
                 Application.ExitThread()
@@ -79,8 +89,11 @@ Public Class Form2
                 MsgBox("Couldn't process your request", MsgBoxStyle.Exclamation, "Error")
             End If
         Else
+            Log("New client request error: " & e.Error.StackTrace)
             MsgBox("Error: " & e.Error.Message, MsgBoxStyle.Exclamation, "Error")
         End If
+
+        Button1.Text = "JOIN"
         Button1.Enabled = True
     End Sub
 End Class

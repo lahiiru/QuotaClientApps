@@ -128,7 +128,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("NO FREE")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("not-set")>  _
         Public Property bssid() As String
             Get
                 Return CType(Me("bssid"),String)

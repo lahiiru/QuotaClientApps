@@ -12,7 +12,6 @@ Imports System.Net.NetworkInformation
 
 
 Public Class Form1
-    Public curr_ssid As String
     Private inactive_color As Color = Color.Gray
     Private active_color As Color = Color.FromArgb(219, 219, 219)
     'connection state variable
@@ -107,10 +106,11 @@ Public Class Form1
                 If Not My.Settings.ssidCollection.Contains(curr_ssid) Then
                     'MsgBox("you are connectd using default key")
                     My.Settings.ssidCollection.Add(curr_ssid)
+                Else
+                    checkAndUpdate()
+                    updateAdvert()
                 End If
                 My.Settings.Save()
-                checkAndUpdate()
-                updateAdvert()
             End If
 
             If .Message.Contains("#NOTCONNECTED") Then
@@ -137,7 +137,13 @@ Public Class Form1
             ElseIf .Message.Contains("#UPDATE:") Then
                 Dim msg = .Message.Replace("#UPDATE:", "")
                 Dim json As JObject = JObject.Parse(msg)
-                updateSettings(json.SelectToken("details").SelectToken("name"), json.SelectToken("details").SelectToken("package").ToString(), json.SelectToken("details").SelectToken("usage"), json.SelectToken("details").SelectToken("expired"), json.SelectToken("details").SelectToken("comment"), json.SelectToken("details").SelectToken("banner"), json.SelectToken("status"), json.SelectToken("details").SelectToken("datetime"), json.SelectToken("details").SelectToken("utname"))
+                If json.SelectToken("details").ToString.Length > 5 Then
+                    updateSettings(json.SelectToken("details").SelectToken("name"), json.SelectToken("details").SelectToken("package").ToString(), json.SelectToken("details").SelectToken("usage"), json.SelectToken("details").SelectToken("expired"), json.SelectToken("details").SelectToken("comment"), json.SelectToken("details").SelectToken("banner"), json.SelectToken("status"), json.SelectToken("details").SelectToken("datetime"), json.SelectToken("details").SelectToken("utname"))
+                Else
+                    ServiceController1.Stop()
+                    MsgBox("Please contact adm.trine@gmail.com / 94770458836 to configure day time and night time plans")
+                    End
+                End If
             ElseIf .Message.Contains("#NEW:")
                 Dim msg = .Message.Replace("#NEW:", "")
                 Dim json As JObject = JObject.Parse(msg)
@@ -214,7 +220,7 @@ Public Class Form1
         TextBox3.Text = ""
     End Sub
     Sub updateAdvert()
-        mainForm.WebBrowser1.Navigate("http://52.24.88.15/quota2/web/app.php/banner/page")
+        mainForm.WebBrowser1.Navigate("http://quota.wearetrying.info/banner/page")
     End Sub
     Function getPassKey(ByVal ssid As String) As String
         Dim passKey As String = ""
@@ -341,6 +347,9 @@ Public Class Form1
 #End Region
 
 #Region "Utility functions"
+    Public Function isFirstConnect() As Boolean
+        Return My.Settings.bssid.Equals("not-set")
+    End Function
     Private Shared Function Encode(ssid As String) As String
         Dim upper As String() = {"A", "B", "C", "D", "E", "F",
             "G", "H", "I", "J", "K", "L",
@@ -622,7 +631,7 @@ Public Class Form1
         Try
             Button9.Enabled = False
             AddHandler wc.DownloadStringCompleted, AddressOf OnChangeComplete
-            wc.DownloadStringAsync(New Uri(requestHandler & "change/" & Val(TextBox1.Text)))
+            wc.DownloadStringAsync(New Uri(GetRequestHandlerURL() & "change/" & Val(TextBox1.Text)))
         Catch ex As Exception
             MsgBox("Error in comunication", MsgBoxStyle.Information, "Error")
             Button9.Enabled = True
@@ -632,7 +641,7 @@ Public Class Form1
         Try
             Button1.Enabled = False
             AddHandler wc.DownloadStringCompleted, AddressOf OnCheckPaymentComplete
-            wc.DownloadStringAsync(New Uri(requestHandler & "checkpayment"))
+            wc.DownloadStringAsync(New Uri(GetRequestHandlerURL() & "checkpayment"))
         Catch ex As Exception
             MsgBox("Error in comunication", MsgBoxStyle.Information, "Error")
             Button1.Enabled = True
@@ -646,7 +655,7 @@ Public Class Form1
             Button8.Enabled = False
 
             AddHandler wc.DownloadStringCompleted, AddressOf OnMessageComplete
-            wc.DownloadStringAsync(New Uri(requestHandler & "message/" & Web.HttpUtility.UrlPathEncode(TextBox2.Text) & "/" & Web.HttpUtility.UrlEncode(TextBox3.Text)))
+            wc.DownloadStringAsync(New Uri(GetRequestHandlerURL(curr_ssid) & "message/" & Web.HttpUtility.UrlPathEncode(TextBox2.Text) & "/" & Web.HttpUtility.UrlEncode(TextBox3.Text)))
         Catch ex As Exception
             MsgBox("Error in comunication", MsgBoxStyle.Information, "Error")
             Button8.Enabled = True
@@ -685,7 +694,7 @@ Public Class Form1
         client.CachePolicy = New System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.BypassCache)
         'AddHandler client.DownloadProgressChanged, AddressOf client_ProgressChanged
         AddHandler client.DownloadStringCompleted, AddressOf updateCheckCompleted
-        client.DownloadStringAsync(New Uri("http://52.24.88.15/Dropbox/quota/updates/updates.txt?t=" & getRandom(1, 99999999)))
+        client.DownloadStringAsync(New Uri(updateIndexURL & "?t=" & getRandom(1, 99999999)))
     End Sub
     Public Sub startUpdate(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
         UpdateTxt = "Starting..."
@@ -704,7 +713,7 @@ Public Class Form1
         If client.IsBusy Then
             'MsgBox("busy downloader")
         End If
-        Dim p = Path.GetTempPath() & "\Quota_Update.exe"
+        Dim p = Path.GetTempPath() & "Quota_Update.exe"
         If My.Computer.FileSystem.FileExists(p) Then
             My.Computer.FileSystem.DeleteFile(p)
         End If
@@ -713,13 +722,24 @@ Public Class Form1
     Private Sub client_ProgressChanged(ByVal sender As Object, ByVal e As System.Net.DownloadProgressChangedEventArgs)
         progress = e.ProgressPercentage
     End Sub
+    Sub Log(msg As String)
+        myLog.WriteEntry(msg)
+    End Sub
     Private Sub updateCheckCompleted(ByVal sender As Object, ByVal e As System.Net.DownloadStringCompletedEventArgs)
         On Error Resume Next
         UpdateTxt = ""
+
         If Not IsNothing(e.Error) Then
-            MsgBox(e.Error.Message, MsgBoxStyle.Exclamation)
+            Log("Error while update check: " & e.Error.StackTrace)
+            If autoApplyUpdates Then
+                autoApplyUpdates = False
+            Else
+                MsgBox(e.Error.Message, MsgBoxStyle.Exclamation)
+            End If
             Exit Sub
         End If
+
+        Log("Update check result: " & e.Result)
         Dim text As String = e.Result
         text = e.Result
         Dim temp As String() = {"", ""}
