@@ -76,7 +76,7 @@ Module Main
         End Try
         mac = iface.NetworkInterface.GetPhysicalAddress.ToString()
         wc.Headers(HttpRequestHeader.UserAgent) = "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 2.0.50727)"
-        wc.Proxy = GlobalProxySelection.GetEmptyWebProxy()
+        wc.Proxy = Nothing
 
         WebRequest.DefaultWebProxy = Nothing
 

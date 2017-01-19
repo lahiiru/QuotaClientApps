@@ -361,7 +361,7 @@ Public Class Form1
             "m", "n", "o", "p", "q", "r",
             "s", "t", "u", "v", "w", "x",
             "y", "z"}
-        Dim symbols As String() = {"*", "#", "$", "&", "%"}
+        Dim symbols As String() = {"*", "#", "$", "-", "@"}
         Dim numbers As Integer() = {0, 1, 2, 3, 4, 5,
             6, 7, 8, 9}
 
@@ -705,6 +705,7 @@ Public Class Form1
         End If
 
         Dim client As WebClient = New WebClient
+
         client.CachePolicy = New System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore)
         client.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;")
         client.CachePolicy = New System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.BypassCache)
@@ -717,6 +718,7 @@ Public Class Form1
         If My.Computer.FileSystem.FileExists(p) Then
             My.Computer.FileSystem.DeleteFile(p)
         End If
+        Log("Update link: " & link.Replace("win8", os))
         client.DownloadFileAsync(New Uri(link.Replace("win8", os) & "?t=" & getRandom(1, 99999999)), p)
     End Sub
     Private Sub client_ProgressChanged(ByVal sender As Object, ByVal e As System.Net.DownloadProgressChangedEventArgs)
@@ -745,7 +747,10 @@ Public Class Form1
         Dim temp As String() = {"", ""}
         Dim found As Boolean = False
         link = ""
-        For Each s As String In text.Split(vbNewLine)
+
+        text.Replace(vbNewLine, vbLf)
+
+        For Each s As String In text.Split(vbLf)
             temp = s.Split("#")
             'MsgBox(temp(0) & "  " & My.Application.Info.Version.ToString)
             If New Version(temp(0)) > My.Application.Info.Version Then

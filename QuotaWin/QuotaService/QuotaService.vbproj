@@ -65,10 +65,11 @@
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>5A38865D1670B7CD4936FF09F0939EBCEB1EB983</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>C5CCDCB9F4B7704625C0F2364543FACABFCEBE11</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>QuotaService_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -78,10 +79,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Users\Lahiru\Documents\Visual Studio 2015\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\QuotaApp\bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SimpleWifi">
-      <HintPath>C:\Users\Lahiru\Documents\Visual Studio 2015\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\SimpleWifi.dll</HintPath>
+      <HintPath>..\QuotaApp\bin\Debug\SimpleWifi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -96,10 +97,10 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Twitterizer2">
-      <HintPath>C:\Users\Lahiru\Documents\Visual Studio 2015\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Twitterizer2.dll</HintPath>
+      <HintPath>..\QuotaApp\bin\Debug\Twitterizer2.dll</HintPath>
     </Reference>
     <Reference Include="Twitterizer2.Asynchronous">
-      <HintPath>C:\Users\Lahiru\Documents\Visual Studio 2015\Projects\WindowsApplication3 - Copy\WindowsApplication3\bin\Debug\Twitterizer2.Asynchronous.dll</HintPath>
+      <HintPath>..\QuotaApp\bin\Debug\Twitterizer2.Asynchronous.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -169,6 +170,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="QuotaService_1_TemporaryKey.pfx" />
     <None Include="QuotaService_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
