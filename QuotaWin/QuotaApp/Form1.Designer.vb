@@ -102,6 +102,7 @@ Partial Class Form1
         Me.Label32 = New System.Windows.Forms.Label()
         Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
         Me.Panel2 = New System.Windows.Forms.Panel()
+        Me.Button6 = New System.Windows.Forms.Button()
         Me.Button10 = New System.Windows.Forms.Button()
         Me.Button5 = New System.Windows.Forms.Button()
         Me.btnProfile = New System.Windows.Forms.Button()
@@ -111,8 +112,10 @@ Partial Class Form1
         Me.btnMessage = New System.Windows.Forms.Button()
         Me.btnPayment = New System.Windows.Forms.Button()
         Me.Timer2 = New System.Windows.Forms.Timer(Me.components)
-        Me.WebBrowser1 = New System.Windows.Forms.WebBrowser()
         Me.Button7 = New System.Windows.Forms.Button()
+        Me.WebBrowser1 = New System.Windows.Forms.WebBrowser()
+        Me.ElementHost1 = New System.Windows.Forms.Integration.ElementHost()
+        Me.UserControl11 = New Quota.UserControl1()
         CType(Me.EventLog1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.StatusStrip1.SuspendLayout()
         Me.tabControl.SuspendLayout()
@@ -936,12 +939,22 @@ Partial Class Form1
         'Panel2
         '
         Me.Panel2.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
+        Me.Panel2.Controls.Add(Me.Button6)
         Me.Panel2.Controls.Add(Me.Button10)
         Me.Panel2.Controls.Add(Me.Button5)
         Me.Panel2.Location = New System.Drawing.Point(591, 160)
         Me.Panel2.Name = "Panel2"
         Me.Panel2.Size = New System.Drawing.Size(146, 270)
         Me.Panel2.TabIndex = 37
+        '
+        'Button6
+        '
+        Me.Button6.Location = New System.Drawing.Point(13, 155)
+        Me.Button6.Name = "Button6"
+        Me.Button6.Size = New System.Drawing.Size(97, 23)
+        Me.Button6.TabIndex = 38
+        Me.Button6.Text = "Button6"
+        Me.Button6.UseVisualStyleBackColor = True
         '
         'Button10
         '
@@ -1060,6 +1073,19 @@ Partial Class Form1
         Me.Timer2.Enabled = True
         Me.Timer2.Interval = 1000
         '
+        'Button7
+        '
+        Me.Button7.BackColor = System.Drawing.Color.Gray
+        Me.Button7.FlatAppearance.BorderSize = 0
+        Me.Button7.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
+        Me.Button7.FlatAppearance.MouseOverBackColor = System.Drawing.Color.White
+        Me.Button7.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button7.Location = New System.Drawing.Point(1, 0)
+        Me.Button7.Name = "Button7"
+        Me.Button7.Size = New System.Drawing.Size(736, 160)
+        Me.Button7.TabIndex = 25
+        Me.Button7.UseVisualStyleBackColor = False
+        '
         'WebBrowser1
         '
         Me.WebBrowser1.Dock = System.Windows.Forms.DockStyle.Top
@@ -1075,18 +1101,14 @@ Partial Class Form1
         Me.WebBrowser1.Visible = False
         Me.WebBrowser1.WebBrowserShortcutsEnabled = False
         '
-        'Button7
+        'ElementHost1
         '
-        Me.Button7.BackColor = System.Drawing.Color.Gray
-        Me.Button7.FlatAppearance.BorderSize = 0
-        Me.Button7.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
-        Me.Button7.FlatAppearance.MouseOverBackColor = System.Drawing.Color.White
-        Me.Button7.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button7.Location = New System.Drawing.Point(1, 0)
-        Me.Button7.Name = "Button7"
-        Me.Button7.Size = New System.Drawing.Size(736, 160)
-        Me.Button7.TabIndex = 25
-        Me.Button7.UseVisualStyleBackColor = False
+        Me.ElementHost1.Location = New System.Drawing.Point(641, 2)
+        Me.ElementHost1.Name = "ElementHost1"
+        Me.ElementHost1.Size = New System.Drawing.Size(75, 450)
+        Me.ElementHost1.TabIndex = 43
+        Me.ElementHost1.Text = "ElementHost1"
+        Me.ElementHost1.Child = Me.UserControl11
         '
         'Form1
         '
@@ -1094,6 +1116,7 @@ Partial Class Form1
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer), CType(CType(219, Byte), Integer))
         Me.ClientSize = New System.Drawing.Size(716, 452)
+        Me.Controls.Add(Me.ElementHost1)
         Me.Controls.Add(Me.Panel2)
         Me.Controls.Add(Me.cmbSSID)
         Me.Controls.Add(Me.btnOffer)
@@ -1188,7 +1211,6 @@ Partial Class Form1
     Friend WithEvents ProgressBar1 As ProgressBar
     Friend WithEvents Panel2 As Panel
     Friend WithEvents LinkLabel1 As LinkLabel
-    Friend WithEvents WebBrowser1 As WebBrowser
     Friend WithEvents Button7 As Button
     Friend WithEvents Label1 As Label
     Friend WithEvents Panel3 As Panel
@@ -1236,4 +1258,8 @@ Partial Class Form1
     Friend WithEvents Button1 As Button
     Friend WithEvents Label32 As Label
     Friend WithEvents Button4 As Button
+    Friend WithEvents Button6 As Button
+    Friend WithEvents WebBrowser1 As WebBrowser
+    Friend WithEvents ElementHost1 As Integration.ElementHost
+    Friend UserControl11 As UserControl1
 End Class

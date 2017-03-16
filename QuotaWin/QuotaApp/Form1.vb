@@ -9,7 +9,7 @@ Imports System.IO
 Imports System.Configuration
 Imports System.Threading
 Imports System.Net.NetworkInformation
-
+Imports System.Drawing.Drawing2D
 
 Public Class Form1
     Private inactive_color As Color = Color.Gray
@@ -420,7 +420,8 @@ Public Class Form1
         WebBrowser1.Visible = True
         slash.Hide()
     End Sub
-    Private Sub cmbSSID_Click(sender As Object, e As EventArgs) Handles cmbSSID.Click
+    Public Sub cmbSSID_Click() Handles cmbSSID.Click
+
         fillSSIDList()
     End Sub
     Private Sub LinkLabel1_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs)
@@ -493,7 +494,7 @@ Public Class Form1
         ToolStripStatusLabel1.Text = "v " & (nif.GetIPv4Statistics.BytesReceived / 1024000.0).ToString("N2") & " Mb."
         ToolStripStatusLabel2.Text = "^ " & (nif.GetIPv4Statistics.BytesSent / 1024000).ToString("N2") & " Mb."
     End Sub
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+    Public Sub Button2_Click() Handles Button2.Click
         'if button caption is CONNECT
         If Button2.Text.ToUpper() = "CONNECT" Then
             'SSID should select inorder to connect
@@ -831,6 +832,41 @@ Public Class Form1
 
         On Error Resume Next
         fillSSIDList()
+    End Sub
+
+    Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+        Dim x As String = InputBox("", "", "https://quota.wearetrying.info/request/user/Quota/A434D9E8CCA9/check")
+        Dim myReq As HttpWebRequest
+        Dim myResp As HttpWebResponse
+
+        myReq = HttpWebRequest.Create(x)
+
+        myReq.Method = "GET"
+        'myReq.ContentType = "application/json"
+        Dim myData As String = "yourDataHere"
+        'myReq.GetRequestStream.Write(System.Text.Encoding.UTF8.GetBytes(myData), 0, System.Text.Encoding.UTF8.GetBytes(myData).Count)
+        myResp = myReq.GetResponse
+        Dim myreader As New System.IO.StreamReader(myResp.GetResponseStream)
+        Dim myText As String
+        myText = myreader.ReadToEnd
+        MsgBox(myText)
+
+        Try
+            AddHandler wc.DownloadStringCompleted, AddressOf OnDlComplete
+
+            'Dim s As String = String.Format("{0}new/{1}/{2}/{3}", GetRequestHandlerURL(), Name, kbytes, Web.HttpUtility.UrlPathEncode(msg))
+            wc.DownloadStringAsync(New Uri(x))
+        Catch ex As Exception
+            MsgBox("Error in comunication. " & ex.Message, MsgBoxStyle.Information, "Error")
+
+        End Try
+    End Sub
+    Private Sub OnDlComplete(ByVal sender As Object, ByVal e As DownloadStringCompletedEventArgs)
+        MsgBox("-->" & e.Result)
+    End Sub
+
+    Private Sub ElementHost1_ChildChanged(sender As Object, e As Integration.ChildChangedEventArgs)
+
     End Sub
 
 #End Region
