@@ -499,10 +499,12 @@ Public Class Form1
         If Button2.Text.ToUpper() = "CONNECT" Then
             'SSID should select inorder to connect
             Dim ssid = cmbSSID.Text
-            If Not ssid Is Nothing Then
+            If Not ssid Is Nothing And ssid.Length > 0 Then
                 curr_ssid = ssid
                 'MsgBox("try to connect using primary..")
                 serviceHandler()
+            Else
+                MsgBox("Please select yor zone name from the list under Connect button", MsgBoxStyle.Exclamation, "Quota")
             End If
         End If
 
@@ -865,10 +867,6 @@ Public Class Form1
         MsgBox("-->" & e.Result)
     End Sub
 
-    Private Sub ElementHost1_ChildChanged(sender As Object, e As Integration.ChildChangedEventArgs)
-
-    End Sub
 
 #End Region
-
 End Class
