@@ -21,6 +21,7 @@ Public Class QuotaService
     Public myLog As New EventLog()
     ' Set up a timer to trigger every minute.
     Public timer As System.Timers.Timer = New System.Timers.Timer()
+    Public timerLock As New Object
     Private irregularStop As Boolean = False 'whether the stop is not healthy or not
     Private ssid As String = ""
     Private customKey As String = ""
@@ -155,10 +156,13 @@ retry:
             Me.Stop()
         End If
 
-        If (My.Settings.pending > 20000) Then
-            Log("Debug code 112")
-            uploadData()
-        End If
+        SyncLock timerLock
+            If (My.Settings.pending > 20000) Then
+                Log("Debug code 112")
+                uploadData()
+            End If
+        End SyncLock
+
         validateApp()
     End Sub
     Sub saveKeys(ByVal UserSelection As NameValueCollection())

@@ -1108,6 +1108,7 @@ Partial Class Form1
         Me.ElementHost1.Size = New System.Drawing.Size(75, 450)
         Me.ElementHost1.TabIndex = 43
         Me.ElementHost1.Text = "ElementHost1"
+        Me.ElementHost1.Visible = False
         Me.ElementHost1.Child = Me.UserControl11
         '
         'Form1
